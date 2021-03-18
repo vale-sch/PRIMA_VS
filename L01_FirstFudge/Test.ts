@@ -1,4 +1,3 @@
-
 namespace L01_FirstFudge {
     import fCore = FudgeCore;
 
