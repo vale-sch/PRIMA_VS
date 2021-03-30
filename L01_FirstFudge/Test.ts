@@ -1,3 +1,4 @@
+
 namespace L01_FirstFudge {
     import fCore = FudgeCore;
     window.addEventListener("load", init);
@@ -23,11 +24,11 @@ namespace L01_FirstFudge {
         viewport.initialize("Viewport", node, cmpCamera, canvas);
         viewport.draw();
 
-        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
+        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 144);
         fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     }
     function update(_event: Event): void {
-        let rotSpeed: number = 90 / 1000;
+        let rotSpeed: number = 90;
         let deltaTime: number = fCore.Loop.timeFrameReal / 1000;
         node.getComponent(fCore.ComponentMesh).mtxPivot.rotateZ(rotSpeed * deltaTime);
         viewport.draw();

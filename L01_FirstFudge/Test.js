@@ -18,11 +18,11 @@ var L01_FirstFudge;
         cmpCamera.mtxPivot.rotateY(180);
         viewport.initialize("Viewport", node, cmpCamera, canvas);
         viewport.draw();
-        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
+        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 144);
         fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
     }
     function update(_event) {
-        let rotSpeed = 90 / 1000;
+        let rotSpeed = 90;
         let deltaTime = fCore.Loop.timeFrameReal / 1000;
         node.getComponent(fCore.ComponentMesh).mtxPivot.rotateZ(rotSpeed * deltaTime);
         viewport.draw();
