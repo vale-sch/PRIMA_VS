@@ -5,8 +5,9 @@ var spaceInvaders;
     class LastEnemy extends fCore.Node {
         constructor() {
             super("LastEnemy");
+            let materialRed = new fCore.Material("RedMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 0, 0, 1)));
             let pyramideEnemy = new fCore.MeshPyramid("Pyramide");
-            let cmpMaterialQuad = new fCore.ComponentMaterial(spaceInvaders.materialRed);
+            let cmpMaterialQuad = new fCore.ComponentMaterial(materialRed);
             this.addComponent(new fCore.ComponentMesh(pyramideEnemy));
             this.addComponent(new fCore.ComponentTransform());
             this.addComponent(cmpMaterialQuad);
