@@ -2,12 +2,10 @@
 namespace SpaceInvaders {
     import fCore = FudgeCore;
     window.addEventListener("load", init);
-
     export let space: fCore.Node = new fCore.Node("SpaceInvaders");
     export let viewport: fCore.Viewport = new fCore.Viewport();
     export let materialGreen: fCore.Material = new fCore.Material("Green", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0, 1, 0, 0.6)));
     export let materialWineRed: fCore.Material = new fCore.Material("WineRed", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0.6, 0.1, 0.3, 1)));
-
     let mainPlayer: fCore.Node = new Player();
     let lastEnemy: fCore.Node = new LastEnemy();
     let cmpCamera: fCore.ComponentCamera = new fCore.ComponentCamera();
