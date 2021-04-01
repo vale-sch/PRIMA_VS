@@ -20,7 +20,7 @@ namespace SpaceInvaders {
             playerChildNode.addComponent(new fCore.ComponentTransform());
             playerChildNode.addComponent(new fCore.ComponentMesh(kanonenRohrMesh));
             playerChildNode.addComponent(cmpMaterialKanonenrohr);
-            playerChildNode.mtxLocal.scale(new fCore.Vector3(0.2, 0.6, 0.2));
+            playerChildNode.mtxLocal.scale(new fCore.Vector3(0.25, 0.6, 0.25));
             playerChildNode.mtxLocal.translateY(0.4);
             this.addChild(playerChildNode);
         }

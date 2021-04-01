@@ -15,6 +15,8 @@ namespace SpaceInvaders {
         let translationY: number = 0;
         let canvas: HTMLCanvasElement = document.querySelector("canvas");
         let protections: fCore.Node = new fCore.Node("protections");
+        protections.addComponent(new fCore.ComponentTransform);
+        protections.mtxLocal.scale(new fCore.Vector3(0.2, 0.2, 0.2));
         for (let i: number = 0; i < 4; i++) {
             translationX += 4;
             let protection: fCore.Node = new Protection(translationX);
@@ -53,8 +55,8 @@ namespace SpaceInvaders {
         shootParticleNode.addComponent(new fCore.ComponentTransform());
         shootParticleNode.addComponent(cmpMaterialQuad);
 
-        shootParticleNode.mtxLocal.scale(new fCore.Vector3(0.05, 0.15, 0.05));
-        shootParticleNode.mtxLocal.translateY(12);
+        shootParticleNode.mtxLocal.scale(new fCore.Vector3(0.1, 0.3, 0.1));
+        shootParticleNode.mtxLocal.translateY(8);
 
         mainPlayer.addChild(shootParticleNode);
     }
