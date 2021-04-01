@@ -1,8 +1,10 @@
 namespace spaceInvaders {
     import fCore = FudgeCore;
     export class LastEnemy extends fCore.Node {
+
         constructor() {
             super("LastEnemy");
+            let materialRed: fCore.Material = new fCore.Material("RedMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 0, 0, 1)));
             let pyramideEnemy: fCore.Mesh = new fCore.MeshPyramid("Pyramide");
             let cmpMaterialQuad: fCore.ComponentMaterial = new fCore.ComponentMaterial(materialRed);
 

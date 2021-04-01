@@ -3,10 +3,8 @@ namespace spaceInvaders {
     import fCore = FudgeCore;
     window.addEventListener("load", init);
     export let space: fCore.Node = new fCore.Node("SpaceInvaders");
-    let viewport: fCore.Viewport = new fCore.Viewport();
+    export let viewport: fCore.Viewport = new fCore.Viewport();
     export let materialGreen: fCore.Material = new fCore.Material("GreenMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0, 1, 0, 1)));
-    export let materialWhite: fCore.Material = new fCore.Material("WhiteMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 1, 1, 1)));
-    export let materialRed: fCore.Material = new fCore.Material("RedMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 0, 0, 1)));
 
     function init(_event: Event): void {
         let translationX: number = 0;
@@ -22,7 +20,6 @@ namespace spaceInvaders {
             let protection: fCore.Node = new Protection(translationX);
             protections.addChild(protection);
         }
-
         translationX = 0;
         let invaders: fCore.Node = new fCore.Node("invaders");
         for (let i: number = 0; i < 48; i++) {
