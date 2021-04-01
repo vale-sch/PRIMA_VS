@@ -13,10 +13,10 @@ var SpaceInvaders;
                     let cmpMaterialQuad = new fCore.ComponentMaterial(randomMaterial);
                     childNodeQuadStripe.addComponent(new fCore.ComponentMesh(quads));
                     childNodeQuadStripe.addComponent(new fCore.ComponentTransform());
-                    childNodeQuadStripe.getComponent(fCore.ComponentMesh).mtxPivot.scale(new fCore.Vector3(0.2, 0.2, 0.2));
                     childNodeQuadStripe.mtxLocal.translateX(i / 10);
                     childNodeQuadStripe.mtxLocal.translateY(j / 10);
                     childNodeQuadStripe.addComponent(cmpMaterialQuad);
+                    childNodeQuadStripe.getComponent(fCore.ComponentMesh).mtxPivot.scale(new fCore.Vector3(0.2, 0.2, 0.2));
                     this.appendChild(childNodeQuadStripe);
                 }
             }
