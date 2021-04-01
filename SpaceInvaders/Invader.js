@@ -5,9 +5,9 @@ var SpaceInvaders;
     class Invader extends fCore.Node {
         constructor(_x, _y) {
             super("Invader" + (_x + _y));
-            let materialWhite = new fCore.Material("WhiteMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 1, 1, 1)));
             let quads = new fCore.MeshQuad("Quads");
-            let cmpMaterialQuad = new fCore.ComponentMaterial(materialWhite);
+            let randomColor = new fCore.Material("RandomMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(Math.random(), Math.random(), Math.random(), 1)));
+            let cmpMaterialQuad = new fCore.ComponentMaterial(randomColor);
             this.addComponent(new fCore.ComponentMesh(quads));
             this.addComponent(new fCore.ComponentTransform());
             this.addComponent(cmpMaterialQuad);

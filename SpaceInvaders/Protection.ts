@@ -21,6 +21,7 @@ namespace SpaceInvaders {
                     this.appendChild(childNodeQuadStripe);
                 }
             }
+            
             this.addComponent(new fCore.ComponentTransform());
             this.mtxLocal.translateY(-2.5);
             this.mtxLocal.translateX(-10.5);

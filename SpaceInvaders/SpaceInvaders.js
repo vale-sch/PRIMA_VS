@@ -7,13 +7,13 @@ var SpaceInvaders;
     SpaceInvaders.viewport = new fCore.Viewport();
     SpaceInvaders.materialGreen = new fCore.Material("Green", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0, 1, 0, 0.6)));
     SpaceInvaders.materialWineRed = new fCore.Material("WineRed", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0.6, 0.1, 0.3, 1)));
-    let mainPlayer = new SpaceInvaders.Player();
+    let mainPlayerShip = new SpaceInvaders.Player();
+    let movementSpeed = 0.005;
     let lastEnemy = new SpaceInvaders.LastEnemy();
-    let cmpCamera = new fCore.ComponentCamera();
     function init(_event) {
+        let canvas = document.querySelector("canvas");
         let translationX = 0;
         let translationY = 0;
-        let canvas = document.querySelector("canvas");
         let protections = new fCore.Node("protections");
         protections.addComponent(new fCore.ComponentTransform);
         protections.mtxLocal.scale(new fCore.Vector3(0.2, 0.2, 0.2));
@@ -33,27 +33,39 @@ var SpaceInvaders;
             let invader = new SpaceInvaders.Invader(translationX, translationY);
             invaders.addChild(invader);
         }
-        SpaceInvaders.space.addChild(mainPlayer);
+        SpaceInvaders.space.addChild(mainPlayerShip);
         SpaceInvaders.space.addChild(protections);
         SpaceInvaders.space.addChild(invaders);
         SpaceInvaders.space.addChild(lastEnemy);
-        console.log(SpaceInvaders.space);
+        let cmpCamera = new fCore.ComponentCamera();
         cmpCamera.mtxPivot.translateZ(3);
         cmpCamera.mtxPivot.rotateY(180);
         SpaceInvaders.viewport.initialize("Viewport", SpaceInvaders.space, cmpCamera, canvas);
-        shootParticles();
-        SpaceInvaders.viewport.draw();
+        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
+        fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
     }
-    function shootParticles() {
-        let shootParticleNode = new fCore.Node("shootParticle");
-        let shootParticle = new fCore.MeshQuad("shootParticle");
-        let cmpMaterialQuad = new fCore.ComponentMaterial(SpaceInvaders.materialWineRed);
-        shootParticleNode.addComponent(new fCore.ComponentMesh(shootParticle));
-        shootParticleNode.addComponent(new fCore.ComponentTransform());
-        shootParticleNode.addComponent(cmpMaterialQuad);
-        shootParticleNode.mtxLocal.scale(new fCore.Vector3(0.1, 0.3, 0.1));
-        shootParticleNode.mtxLocal.translateY(8);
-        mainPlayer.addChild(shootParticleNode);
+    let isRight = true;
+    let isLeft = false;
+    function update(_event) {
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.4)
+            mainPlayerShip.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && mainPlayerShip.mtxLocal.translation.x < 1.4)
+            mainPlayerShip.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
+        if (lastEnemy.mtxLocal.translation.x > -1.3 && !isLeft) {
+            if (lastEnemy.mtxLocal.translation.x < -1.25) {
+                isLeft = true;
+                isRight = false;
+            }
+            lastEnemy.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
+        }
+        if (lastEnemy.mtxLocal.translation.x < 1.3 && !isRight) {
+            if (lastEnemy.mtxLocal.translation.x > 1.25) {
+                isLeft = false;
+                isRight = true;
+            }
+            lastEnemy.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
+        }
+        SpaceInvaders.viewport.draw();
     }
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=SpaceInvaders.js.map

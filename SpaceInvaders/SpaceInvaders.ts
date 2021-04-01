@@ -6,14 +6,17 @@ namespace SpaceInvaders {
     export let viewport: fCore.Viewport = new fCore.Viewport();
     export let materialGreen: fCore.Material = new fCore.Material("Green", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0, 1, 0, 0.6)));
     export let materialWineRed: fCore.Material = new fCore.Material("WineRed", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0.6, 0.1, 0.3, 1)));
-    let mainPlayer: fCore.Node = new Player();
-    let lastEnemy: fCore.Node = new LastEnemy();
-    let cmpCamera: fCore.ComponentCamera = new fCore.ComponentCamera();
 
+    let mainPlayerShip: fCore.Node = new Player();
+    let movementSpeed: number = 0.005;
+
+    let lastEnemy: fCore.Node = new LastEnemy();
+    
     function init(_event: Event): void {
+        let canvas: HTMLCanvasElement = document.querySelector("canvas");
+
         let translationX: number = 0;
         let translationY: number = 0;
-        let canvas: HTMLCanvasElement = document.querySelector("canvas");
         let protections: fCore.Node = new fCore.Node("protections");
         protections.addComponent(new fCore.ComponentTransform);
         protections.mtxLocal.scale(new fCore.Vector3(0.2, 0.2, 0.2));
@@ -33,31 +36,44 @@ namespace SpaceInvaders {
             let invader: fCore.Node = new Invader(translationX, translationY);
             invaders.addChild(invader);
         }
-        space.addChild(mainPlayer);
+        space.addChild(mainPlayerShip);
         space.addChild(protections);
         space.addChild(invaders);
         space.addChild(lastEnemy);
-        console.log(space);
 
+        let cmpCamera: fCore.ComponentCamera = new fCore.ComponentCamera();
         cmpCamera.mtxPivot.translateZ(3);
         cmpCamera.mtxPivot.rotateY(180);
 
         viewport.initialize("Viewport", space, cmpCamera, canvas);
-        shootParticles();
-        viewport.draw();
+
+        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
+        fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     }
-    function shootParticles(): void {
-        let shootParticleNode: fCore.Node = new fCore.Node("shootParticle");
-        let shootParticle: fCore.Mesh = new fCore.MeshQuad("shootParticle");
-        let cmpMaterialQuad: fCore.ComponentMaterial = new fCore.ComponentMaterial(materialWineRed);
+    
+    let isRight: boolean = true;
+    let isLeft: boolean = false;
+    function update(_event: Event): void {
+       if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.4)
+           mainPlayerShip.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
+       if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && mainPlayerShip.mtxLocal.translation.x < 1.4)
+           mainPlayerShip.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
 
-        shootParticleNode.addComponent(new fCore.ComponentMesh(shootParticle));
-        shootParticleNode.addComponent(new fCore.ComponentTransform());
-        shootParticleNode.addComponent(cmpMaterialQuad);
+       if (lastEnemy.mtxLocal.translation.x > -1.3 && !isLeft) {
+        if (lastEnemy.mtxLocal.translation.x < -1.25) {
+            isLeft = true;
+            isRight = false;
+        }
+        lastEnemy.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
+       }
+       if (lastEnemy.mtxLocal.translation.x < 1.3 && !isRight) {
+        if (lastEnemy.mtxLocal.translation.x > 1.25) {
+            isLeft = false;
+            isRight = true;
+        }
+        lastEnemy.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
+       } 
 
-        shootParticleNode.mtxLocal.scale(new fCore.Vector3(0.1, 0.3, 0.1));
-        shootParticleNode.mtxLocal.translateY(8);
-
-        mainPlayer.addChild(shootParticleNode);
+       viewport.draw();
     }
 }
