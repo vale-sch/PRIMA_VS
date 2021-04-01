@@ -46,11 +46,23 @@ var SpaceInvaders;
     }
     let isRight = true;
     let isLeft = false;
+    let moveUp = 0;
     function update(_event) {
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.4)
             mainPlayerShip.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && mainPlayerShip.mtxLocal.translation.x < 1.4)
             mainPlayerShip.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
+        let shotNodes = new fCore.Node("shotNodes");
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE])) {
+            let shotNode = new fCore.Node("shotNode");
+            shotNode.addComponent(new fCore.ComponentTransform);
+            let shotParticle = new fCore.MeshQuad("shotParticle");
+            shotNode.addComponent(new fCore.ComponentMesh(shotParticle));
+            shotNode.addComponent(new fCore.ComponentMaterial(SpaceInvaders.materialWineRed));
+            shotNode.mtxLocal.scale(new fCore.Vector3(0.1, 0.2, 0.1));
+            shotNode.mtxLocal.translateY(moveUp += fCore.Loop.timeFrameReal * 0.0005);
+            SpaceInvaders.space.appendChild(shotNodes);
+        }
         if (lastEnemy.mtxLocal.translation.x > -1.3 && !isLeft) {
             if (lastEnemy.mtxLocal.translation.x < -1.25) {
                 isLeft = true;
