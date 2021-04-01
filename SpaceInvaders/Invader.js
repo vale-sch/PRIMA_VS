@@ -1,6 +1,6 @@
 "use strict";
-var spaceInvaders;
-(function (spaceInvaders) {
+var SpaceInvaders;
+(function (SpaceInvaders) {
     var fCore = FudgeCore;
     class Invader extends fCore.Node {
         constructor(_x, _y) {
@@ -18,6 +18,6 @@ var spaceInvaders;
             this.mtxLocal.translateY(_y);
         }
     }
-    spaceInvaders.Invader = Invader;
-})(spaceInvaders || (spaceInvaders = {}));
+    SpaceInvaders.Invader = Invader;
+})(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=Invader.js.map

@@ -1,12 +1,12 @@
 "use strict";
-var spaceInvaders;
-(function (spaceInvaders) {
+var SpaceInvaders;
+(function (SpaceInvaders) {
     var fCore = FudgeCore;
     class Protection extends fCore.Node {
         constructor(_x) {
             super("Protection" + _x);
             let quads = new fCore.MeshQuad("Quads");
-            let cmpMaterialQuad = new fCore.ComponentMaterial(spaceInvaders.materialGreen);
+            let cmpMaterialQuad = new fCore.ComponentMaterial(SpaceInvaders.materialGreen);
             this.addComponent(new fCore.ComponentMesh(quads));
             this.addComponent(new fCore.ComponentTransform());
             this.addComponent(cmpMaterialQuad);
@@ -16,6 +16,6 @@ var spaceInvaders;
             this.mtxLocal.translateX(_x);
         }
     }
-    spaceInvaders.Protection = Protection;
-})(spaceInvaders || (spaceInvaders = {}));
+    SpaceInvaders.Protection = Protection;
+})(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=Protection.js.map

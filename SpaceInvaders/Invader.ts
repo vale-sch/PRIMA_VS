@@ -1,4 +1,4 @@
-namespace spaceInvaders {
+namespace SpaceInvaders {
     import fCore = FudgeCore;
     export class Invader extends fCore.Node {
         constructor(_x: number, _y: number) {

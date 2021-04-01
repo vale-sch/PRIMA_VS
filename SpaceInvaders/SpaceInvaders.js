@@ -1,21 +1,23 @@
 "use strict";
-var spaceInvaders;
-(function (spaceInvaders) {
+var SpaceInvaders;
+(function (SpaceInvaders) {
     var fCore = FudgeCore;
     window.addEventListener("load", init);
-    spaceInvaders.space = new fCore.Node("SpaceInvaders");
-    spaceInvaders.viewport = new fCore.Viewport();
-    spaceInvaders.materialGreen = new fCore.Material("Green", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0, 1, 0, 1)));
+    SpaceInvaders.space = new fCore.Node("SpaceInvaders");
+    SpaceInvaders.viewport = new fCore.Viewport();
+    SpaceInvaders.materialGreen = new fCore.Material("Green", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0, 1, 0, 0.6)));
+    SpaceInvaders.materialWineRed = new fCore.Material("WineRed", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(0.6, 0.1, 0.3, 1)));
+    let mainPlayer = new SpaceInvaders.Player();
+    let lastEnemy = new SpaceInvaders.LastEnemy();
+    let cmpCamera = new fCore.ComponentCamera();
     function init(_event) {
         let translationX = 0;
         let translationY = 0;
         let canvas = document.querySelector("canvas");
-        let mainPlayer = new spaceInvaders.Player();
-        let lastEnemy = new spaceInvaders.LastEnemy();
         let protections = new fCore.Node("protections");
         for (let i = 0; i < 4; i++) {
             translationX += 4;
-            let protection = new spaceInvaders.Protection(translationX);
+            let protection = new SpaceInvaders.Protection(translationX);
             protections.addChild(protection);
         }
         translationX = 0;
@@ -26,19 +28,30 @@ var spaceInvaders;
                 translationX = 1.75;
                 translationY -= 3;
             }
-            let invader = new spaceInvaders.Invader(translationX, translationY);
+            let invader = new SpaceInvaders.Invader(translationX, translationY);
             invaders.addChild(invader);
         }
-        spaceInvaders.space.addChild(mainPlayer);
-        spaceInvaders.space.addChild(protections);
-        spaceInvaders.space.addChild(invaders);
-        spaceInvaders.space.addChild(lastEnemy);
-        console.log(spaceInvaders.space);
-        let cmpCamera = new fCore.ComponentCamera();
+        SpaceInvaders.space.addChild(mainPlayer);
+        SpaceInvaders.space.addChild(protections);
+        SpaceInvaders.space.addChild(invaders);
+        SpaceInvaders.space.addChild(lastEnemy);
+        console.log(SpaceInvaders.space);
         cmpCamera.mtxPivot.translateZ(3);
         cmpCamera.mtxPivot.rotateY(180);
-        spaceInvaders.viewport.initialize("Viewport", spaceInvaders.space, cmpCamera, canvas);
-        spaceInvaders.viewport.draw();
+        SpaceInvaders.viewport.initialize("Viewport", SpaceInvaders.space, cmpCamera, canvas);
+        shootParticles();
+        SpaceInvaders.viewport.draw();
     }
-})(spaceInvaders || (spaceInvaders = {}));
+    function shootParticles() {
+        let shootParticleNode = new fCore.Node("shootParticle");
+        let shootParticle = new fCore.MeshQuad("shootParticle");
+        let cmpMaterialQuad = new fCore.ComponentMaterial(SpaceInvaders.materialWineRed);
+        shootParticleNode.addComponent(new fCore.ComponentMesh(shootParticle));
+        shootParticleNode.addComponent(new fCore.ComponentTransform());
+        shootParticleNode.addComponent(cmpMaterialQuad);
+        shootParticleNode.mtxLocal.scale(new fCore.Vector3(0.05, 0.15, 0.05));
+        shootParticleNode.mtxLocal.translateY(12);
+        mainPlayer.addChild(shootParticleNode);
+    }
+})(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=SpaceInvaders.js.map

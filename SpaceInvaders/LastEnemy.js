@@ -1,11 +1,11 @@
 "use strict";
-var spaceInvaders;
-(function (spaceInvaders) {
+var SpaceInvaders;
+(function (SpaceInvaders) {
     var fCore = FudgeCore;
     class LastEnemy extends fCore.Node {
         constructor() {
             super("LastEnemy");
-            let materialRed = new fCore.Material("RedMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 0, 0, 1)));
+            let materialRed = new fCore.Material("RedMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(1, 0, 0, 0.6)));
             let pyramideEnemy = new fCore.MeshPyramid("Pyramide");
             let cmpMaterialQuad = new fCore.ComponentMaterial(materialRed);
             this.addComponent(new fCore.ComponentMesh(pyramideEnemy));
@@ -16,6 +16,6 @@ var spaceInvaders;
             this.mtxLocal.rotateX(180);
         }
     }
-    spaceInvaders.LastEnemy = LastEnemy;
-})(spaceInvaders || (spaceInvaders = {}));
+    SpaceInvaders.LastEnemy = LastEnemy;
+})(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=LastEnemy.js.map

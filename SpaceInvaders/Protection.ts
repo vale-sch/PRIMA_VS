@@ -1,4 +1,4 @@
-namespace spaceInvaders {
+namespace SpaceInvaders {
     import fCore = FudgeCore;
     export class Protection extends fCore.Node {
         constructor(_x: number) {
