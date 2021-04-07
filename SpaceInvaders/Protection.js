@@ -2,9 +2,9 @@
 var SpaceInvaders;
 (function (SpaceInvaders) {
     var fCore = FudgeCore;
-    class Protection extends fCore.Node {
+    class Protection extends SpaceInvaders.QuadNode {
         constructor(_x) {
-            super("Protection" + _x);
+            super("Protection", new fCore.Vector2(_x, -2.5), new fCore.Vector2(1, 1));
             let quads = new fCore.MeshQuad("Quads");
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
@@ -20,10 +20,7 @@ var SpaceInvaders;
                     this.appendChild(childNodeQuadStripe);
                 }
             }
-            this.addComponent(new fCore.ComponentTransform());
-            this.mtxLocal.translateY(-2.5);
             this.mtxLocal.translateX(-10.5);
-            this.mtxLocal.translateX(_x);
         }
     }
     SpaceInvaders.Protection = Protection;
