@@ -31,6 +31,7 @@ namespace SpaceInvaders {
         fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
         fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     }
+
     function buildGraphics(): void {
         let translationX: number = 0;
         let translationY: number = 0;
@@ -75,6 +76,7 @@ namespace SpaceInvaders {
 
         viewport.draw();
     }
+
     function handlePlayerMovement(): void {
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.4)
             mainPlayerShip.mtxLocal.translateX(2 * -movementSpeed * fCore.Loop.timeFrameReal);
@@ -99,6 +101,7 @@ namespace SpaceInvaders {
             }
         });
     }
+
     function handleEnemyMovement(): void {
         if (lastEnemy.mtxLocal.translation.x > -1.3 && !isLeft) {
             if (lastEnemy.mtxLocal.translation.x < -1.25) {
