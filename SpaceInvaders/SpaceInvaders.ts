@@ -89,29 +89,25 @@ namespace SpaceInvaders {
             shootTimer = 0.667;
         }
         //PROJEKTILE SKRIPT
-        projectilesNode.getChildren().forEach(projectile => {
-            if (projectile.mtxLocal.translation.y < 1.2) {
-
-                let realProjectile: Projectile = <Projectile>projectile;
-                realProjectile.movingUpProjectile(deltaTime);
-            }
-            else {
-                console.log("Removed Child at an Height of: " + projectile.mtxLocal.translation.y.toFixed(3));
+        //verinfachte Schreibweise
+        for (let projectile of projectilesNode.getChildren() as Projectile[]) {
+            if (projectile.mtxLocal.translation.y < 1.2)
+                projectile.movingUpProjectile(deltaTime);
+            else
                 projectilesNode.removeChild(projectile);
-            }
-        });
+        }
     }
 
     function handleEnemyMovement(): void {
-        if (lastEnemy.mtxLocal.translation.x > -1.3 && !isLeft) {
-            if (lastEnemy.mtxLocal.translation.x < -1.25) {
+        if (lastEnemy.mtxLocal.translation.x > -1.3367 && !isLeft) {
+            if (lastEnemy.mtxLocal.translation.x < -1.3) {
                 isLeft = true;
                 isRight = false;
             }
             lastEnemy.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
         }
-        if (lastEnemy.mtxLocal.translation.x < 1.3 && !isRight) {
-            if (lastEnemy.mtxLocal.translation.x > 1.25) {
+        if (lastEnemy.mtxLocal.translation.x < 1.3367 && !isRight) {
+            if (lastEnemy.mtxLocal.translation.x > 1.3) {
                 isLeft = false;
                 isRight = true;
             }
