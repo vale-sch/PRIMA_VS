@@ -74,13 +74,18 @@ namespace SpaceInvaders {
 
         handleEnemyMovement();
 
+        checkProjectileCollision();
+
+
+
+
         viewport.draw();
     }
 
     function handlePlayerMovement(): void {
-        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.4)
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.5)
             mainPlayerShip.mtxLocal.translateX(2 * -movementSpeed * fCore.Loop.timeFrameReal);
-        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && mainPlayerShip.mtxLocal.translation.x < 1.4)
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && mainPlayerShip.mtxLocal.translation.x < 1.5)
             mainPlayerShip.mtxLocal.translateX(2 * movementSpeed * fCore.Loop.timeFrameReal);
 
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]) && shootTimer <= 0) {
@@ -99,19 +104,29 @@ namespace SpaceInvaders {
     }
 
     function handleEnemyMovement(): void {
-        if (lastEnemy.mtxLocal.translation.x > -1.3367 && !isLeft) {
-            if (lastEnemy.mtxLocal.translation.x < -1.3) {
+        if (lastEnemy.mtxLocal.translation.x > -1.45 && !isLeft) {
+            if (lastEnemy.mtxLocal.translation.x < -1.4) {
                 isLeft = true;
                 isRight = false;
             }
             lastEnemy.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
         }
-        if (lastEnemy.mtxLocal.translation.x < 1.3367 && !isRight) {
-            if (lastEnemy.mtxLocal.translation.x > 1.3) {
+        if (lastEnemy.mtxLocal.translation.x < 1.45 && !isRight) {
+            if (lastEnemy.mtxLocal.translation.x > 1.4) {
                 isLeft = false;
                 isRight = true;
             }
             lastEnemy.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
+        }
+    }
+    function checkProjectileCollision(): void {
+        for (let projectile of projectilesNode.getChildren() as Projectile[]) {
+            for (let invader of invaders.getChildren() as Invader[]) {
+                if (projectile.checkCollision(invader)) {
+                    projectilesNode.removeChild(projectile);
+                    invaders.removeChild(invader);
+                }
+            }
         }
     }
 }

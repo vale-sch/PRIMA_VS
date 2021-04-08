@@ -6,16 +6,24 @@ var SpaceInvaders;
         constructor(_name, _pos, _scale) {
             super(_name);
             let randomColorMat = new fCore.Material("randomMaterial", fCore.ShaderUniColor, new fCore.CoatColored(new fCore.Color(Math.random(), Math.random(), Math.random(), 1)));
+            this.rect = new fCore.Rectangle(_pos.x, _pos.y, _scale.x, _scale.y, fCore.ORIGIN2D.CENTER);
             this.addComponent(new fCore.ComponentTransform());
             this.mtxLocal.translateX(_pos.x);
             this.mtxLocal.translateY(_pos.y);
             let quad = new fCore.MeshQuad();
-            let cmpMesh = new fCore.ComponentMesh(quad);
-            cmpMesh.mtxPivot.scaleX(_scale.x);
-            cmpMesh.mtxPivot.scaleY(_scale.y);
+            let cmpQuad = new fCore.ComponentMesh(quad);
+            cmpQuad.mtxPivot.scaleX(_scale.x);
+            cmpQuad.mtxPivot.scaleY(_scale.y);
             if (_name != "Protection")
-                this.addComponent(cmpMesh);
+                this.addComponent(cmpQuad);
             this.addComponent(new fCore.ComponentMaterial(randomColorMat));
+        }
+        checkCollision(_target) {
+            return this.rect.collides(_target.rect);
+        }
+        setRectPosition() {
+            // this.rect.position.x = this.mtxLocal.translation.x - this.rect.size.x / 10;
+            //this.rect.position.y = this.mtxLocal.translation.y - this.rect.size.y / 10;
         }
     }
     SpaceInvaders.QuadNode = QuadNode;
