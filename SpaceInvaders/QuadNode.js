@@ -9,7 +9,8 @@ var SpaceInvaders;
             this.addComponent(new fCore.ComponentTransform());
             this.mtxLocal.translateX(_pos.x);
             this.mtxLocal.translateY(_pos.y);
-            let cmpMesh = new fCore.ComponentMesh(QuadNode.mesh);
+            let quad = new fCore.MeshQuad();
+            let cmpMesh = new fCore.ComponentMesh(quad);
             cmpMesh.mtxPivot.scaleX(_scale.x);
             cmpMesh.mtxPivot.scaleY(_scale.y);
             if (_name != "Protection")
@@ -17,7 +18,6 @@ var SpaceInvaders;
             this.addComponent(new fCore.ComponentMaterial(randomColorMat));
         }
     }
-    QuadNode.mesh = new fCore.MeshQuad("Quad");
     SpaceInvaders.QuadNode = QuadNode;
 })(SpaceInvaders || (SpaceInvaders = {}));
 //# sourceMappingURL=QuadNode.js.map
