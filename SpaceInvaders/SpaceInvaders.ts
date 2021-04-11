@@ -1,12 +1,11 @@
-
 namespace SpaceInvaders {
     import fCore = FudgeCore;
     window.addEventListener("load", init);
 
-    export let space: fCore.Node = new fCore.Node("SpaceInvaders");
+    export let space: fCore.Node = new fCore.Node("SpaceInvaders - Global Space - Parent Node");
     export let viewport: fCore.Viewport = new fCore.Viewport();
     export let mainPlayerShip: fCore.Node = new Player();
-    export let projectilesNode: fCore.Node = new fCore.Node("shotNode");
+    export let projectilesContainer: fCore.Node = new fCore.Node("projectilesContainer");
     export let deltaTime: number;
     export let movementSpeed: number = 0.0005;
 
@@ -14,8 +13,10 @@ namespace SpaceInvaders {
     let isLeft: boolean = false;
     let shootTimer: number = 2;
     let lastEnemy: fCore.Node = new LastEnemy();
-    let protections: fCore.Node = new fCore.Node("protections");
-    let invaders: fCore.Node = new fCore.Node("invaders");
+    let protectionsContainer: fCore.Node = new fCore.Node("protectionsContainer");
+    let protectionContainer: fCore.Node = new fCore.Node("protectionNode");
+
+    let invadersContainer: fCore.Node = new fCore.Node("invadersContainer");
 
     function init(_event: Event): void {
         let canvas: HTMLCanvasElement = document.querySelector("canvas");
@@ -36,15 +37,27 @@ namespace SpaceInvaders {
         let translationX: number = 0;
         let translationY: number = 0;
 
-        protections.addComponent(new fCore.ComponentTransform);
-        protections.mtxLocal.scale(new fCore.Vector3(0.2, 0.2, 0.2));
+
         for (let i: number = 0; i < 4; i++) {
-            translationX += 4;
-            let protection: fCore.Node = new Protection(translationX);
-            protections.addChild(protection);
+            protectionContainer = new fCore.Node("protectionNode");
+            protectionContainer.addComponent(new fCore.ComponentTransform);
+
+            translationX += 0.8;
+            protectionContainer.mtxLocal.translateX(translationX - 10.5 / 5);
+            protectionContainer.mtxLocal.translateY(-0.5);
+
+            for (let i: number = 0; i < 4; i++) {
+                for (let j: number = 0; j < 4; j++) {
+                    let protectionStripe: ProtectionsStripes = new ProtectionsStripes("ProtectionsStripe", new fCore.Vector2(i / 12.5, j / 12.5), new fCore.Vector2(0.05, 0.05));
+                    protectionContainer.appendChild(protectionStripe);
+                }
+            }
+            protectionsContainer.appendChild(protectionContainer);
         }
         translationX = 0;
-
+        invadersContainer.addComponent(new fCore.ComponentTransform);
+        invadersContainer.mtxLocal.translateX(-1.675);
+        invadersContainer.mtxLocal.translateY(0.8);
         for (let i: number = 0; i < 48; i++) {
             translationX += 0.2;
             if (i % 16 == 0) {
@@ -52,17 +65,17 @@ namespace SpaceInvaders {
                 translationY -= 0.3;
             }
             let invader: fCore.Node = new Invader(translationX, translationY);
-            invaders.addChild(invader);
+            invadersContainer.addChild(invader);
         }
-        projectilesNode.addComponent(new fCore.ComponentTransform);
+        projectilesContainer.addComponent(new fCore.ComponentTransform);
     }
 
     function appendToFatherTree(): void {
         space.addChild(mainPlayerShip);
-        space.addChild(protections);
-        space.addChild(invaders);
+        space.addChild(protectionsContainer);
+        space.addChild(invadersContainer);
         space.addChild(lastEnemy);
-        space.addChild(projectilesNode);
+        space.addChild(projectilesContainer);
         console.log(space);
     }
 
@@ -75,8 +88,7 @@ namespace SpaceInvaders {
         handleEnemyMovement();
 
         checkProjectileCollision();
-
-
+        checkCollisionOfQuadStripes();
 
 
         viewport.draw();
@@ -90,16 +102,16 @@ namespace SpaceInvaders {
 
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]) && shootTimer <= 0) {
             let projectileChildNode: fCore.Node = new Projectile();
-            projectilesNode.addChild(projectileChildNode);
-            shootTimer = 0.667;
+            projectilesContainer.addChild(projectileChildNode);
+            shootTimer = 0.1;
         }
         //PROJEKTILE SKRIPT
         //verinfachte Schreibweise
-        for (let projectile of projectilesNode.getChildren() as Projectile[]) {
+        for (let projectile of projectilesContainer.getChildren() as Projectile[]) {
             if (projectile.mtxLocal.translation.y < 1.2)
                 projectile.movingUpProjectile(deltaTime);
             else
-                projectilesNode.removeChild(projectile);
+                projectilesContainer.removeChild(projectile);
         }
     }
 
@@ -120,11 +132,22 @@ namespace SpaceInvaders {
         }
     }
     function checkProjectileCollision(): void {
-        for (let projectile of projectilesNode.getChildren() as Projectile[]) {
-            for (let invader of invaders.getChildren() as Invader[]) {
+        for (let projectile of projectilesContainer.getChildren() as Projectile[]) {
+            for (let invader of invadersContainer.getChildren() as Invader[]) {
                 if (projectile.checkCollision(invader)) {
-                    projectilesNode.removeChild(projectile);
-                    invaders.removeChild(invader);
+                    projectilesContainer.removeChild(projectile);
+                    invadersContainer.removeChild(invader);
+                }
+            }
+        }
+    }
+
+    function checkCollisionOfQuadStripes(): void {
+        for (let projectile of projectilesContainer.getChildren() as Projectile[]) {
+            for (let protectionStripes of protectionContainer.getChildren() as ProtectionsStripes[]) {
+                if (projectile.checkCollision(protectionStripes)) {
+                    projectilesContainer.removeChild(projectile);
+                    protectionsContainer.removeChild(protectionStripes);
                 }
             }
         }

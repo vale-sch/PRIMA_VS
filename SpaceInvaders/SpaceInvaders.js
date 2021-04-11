@@ -3,17 +3,18 @@ var SpaceInvaders;
 (function (SpaceInvaders) {
     var fCore = FudgeCore;
     window.addEventListener("load", init);
-    SpaceInvaders.space = new fCore.Node("SpaceInvaders");
+    SpaceInvaders.space = new fCore.Node("SpaceInvaders - Global Space - Parent Node");
     SpaceInvaders.viewport = new fCore.Viewport();
     SpaceInvaders.mainPlayerShip = new SpaceInvaders.Player();
-    SpaceInvaders.projectilesNode = new fCore.Node("shotNode");
+    SpaceInvaders.projectilesContainer = new fCore.Node("projectilesContainer");
     SpaceInvaders.movementSpeed = 0.0005;
     let isRight = true;
     let isLeft = false;
     let shootTimer = 2;
     let lastEnemy = new SpaceInvaders.LastEnemy();
-    let protections = new fCore.Node("protections");
-    let invaders = new fCore.Node("invaders");
+    let protectionsContainer = new fCore.Node("protectionsContainer");
+    let protectionContainer = new fCore.Node("protectionNode");
+    let invadersContainer = new fCore.Node("invadersContainer");
     function init(_event) {
         let canvas = document.querySelector("canvas");
         buildGraphics();
@@ -28,14 +29,24 @@ var SpaceInvaders;
     function buildGraphics() {
         let translationX = 0;
         let translationY = 0;
-        protections.addComponent(new fCore.ComponentTransform);
-        protections.mtxLocal.scale(new fCore.Vector3(0.2, 0.2, 0.2));
         for (let i = 0; i < 4; i++) {
-            translationX += 4;
-            let protection = new SpaceInvaders.Protection(translationX);
-            protections.addChild(protection);
+            protectionContainer = new fCore.Node("protectionNode");
+            protectionContainer.addComponent(new fCore.ComponentTransform);
+            translationX += 0.8;
+            protectionContainer.mtxLocal.translateX(translationX - 10.5 / 5);
+            protectionContainer.mtxLocal.translateY(-0.5);
+            for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
+                    let protectionStripe = new SpaceInvaders.ProtectionsStripes("ProtectionsStripe", new fCore.Vector2(i / 12.5, j / 12.5), new fCore.Vector2(0.05, 0.05));
+                    protectionContainer.appendChild(protectionStripe);
+                }
+            }
+            protectionsContainer.appendChild(protectionContainer);
         }
         translationX = 0;
+        invadersContainer.addComponent(new fCore.ComponentTransform);
+        invadersContainer.mtxLocal.translateX(-1.675);
+        invadersContainer.mtxLocal.translateY(0.8);
         for (let i = 0; i < 48; i++) {
             translationX += 0.2;
             if (i % 16 == 0) {
@@ -43,16 +54,16 @@ var SpaceInvaders;
                 translationY -= 0.3;
             }
             let invader = new SpaceInvaders.Invader(translationX, translationY);
-            invaders.addChild(invader);
+            invadersContainer.addChild(invader);
         }
-        SpaceInvaders.projectilesNode.addComponent(new fCore.ComponentTransform);
+        SpaceInvaders.projectilesContainer.addComponent(new fCore.ComponentTransform);
     }
     function appendToFatherTree() {
         SpaceInvaders.space.addChild(SpaceInvaders.mainPlayerShip);
-        SpaceInvaders.space.addChild(protections);
-        SpaceInvaders.space.addChild(invaders);
+        SpaceInvaders.space.addChild(protectionsContainer);
+        SpaceInvaders.space.addChild(invadersContainer);
         SpaceInvaders.space.addChild(lastEnemy);
-        SpaceInvaders.space.addChild(SpaceInvaders.projectilesNode);
+        SpaceInvaders.space.addChild(SpaceInvaders.projectilesContainer);
         console.log(SpaceInvaders.space);
     }
     function update(_event) {
@@ -61,6 +72,7 @@ var SpaceInvaders;
         handlePlayerMovement();
         handleEnemyMovement();
         checkProjectileCollision();
+        checkCollisionOfQuadStripes();
         SpaceInvaders.viewport.draw();
     }
     function handlePlayerMovement() {
@@ -70,16 +82,16 @@ var SpaceInvaders;
             SpaceInvaders.mainPlayerShip.mtxLocal.translateX(2 * SpaceInvaders.movementSpeed * fCore.Loop.timeFrameReal);
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]) && shootTimer <= 0) {
             let projectileChildNode = new SpaceInvaders.Projectile();
-            SpaceInvaders.projectilesNode.addChild(projectileChildNode);
-            shootTimer = 0.667;
+            SpaceInvaders.projectilesContainer.addChild(projectileChildNode);
+            shootTimer = 0.1;
         }
         //PROJEKTILE SKRIPT
         //verinfachte Schreibweise
-        for (let projectile of SpaceInvaders.projectilesNode.getChildren()) {
+        for (let projectile of SpaceInvaders.projectilesContainer.getChildren()) {
             if (projectile.mtxLocal.translation.y < 1.2)
                 projectile.movingUpProjectile(SpaceInvaders.deltaTime);
             else
-                SpaceInvaders.projectilesNode.removeChild(projectile);
+                SpaceInvaders.projectilesContainer.removeChild(projectile);
         }
     }
     function handleEnemyMovement() {
@@ -99,11 +111,21 @@ var SpaceInvaders;
         }
     }
     function checkProjectileCollision() {
-        for (let projectile of SpaceInvaders.projectilesNode.getChildren()) {
-            for (let invader of invaders.getChildren()) {
+        for (let projectile of SpaceInvaders.projectilesContainer.getChildren()) {
+            for (let invader of invadersContainer.getChildren()) {
                 if (projectile.checkCollision(invader)) {
-                    SpaceInvaders.projectilesNode.removeChild(projectile);
-                    invaders.removeChild(invader);
+                    SpaceInvaders.projectilesContainer.removeChild(projectile);
+                    invadersContainer.removeChild(invader);
+                }
+            }
+        }
+    }
+    function checkCollisionOfQuadStripes() {
+        for (let projectile of SpaceInvaders.projectilesContainer.getChildren()) {
+            for (let protectionStripes of protectionContainer.getChildren()) {
+                if (projectile.checkCollision(protectionStripes)) {
+                    SpaceInvaders.projectilesContainer.removeChild(projectile);
+                    protectionsContainer.removeChild(protectionStripes);
                 }
             }
         }
