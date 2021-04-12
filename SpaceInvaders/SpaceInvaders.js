@@ -7,13 +7,17 @@ var SpaceInvaders;
     SpaceInvaders.viewport = new fCore.Viewport();
     SpaceInvaders.mainPlayerShip = new SpaceInvaders.Player();
     SpaceInvaders.projectilesContainer = new fCore.Node("projectilesContainer");
-    SpaceInvaders.movementSpeed = 0.0005;
-    let isRight = true;
-    let isLeft = false;
+    SpaceInvaders.movementSpeed = 0.5;
+    let isRightEnemy = true;
+    let isLeftEnemy = false;
+    let isRightInvaders = true;
+    let isLeftInvaders = false;
     let shootTimer = 2;
     let lastEnemy = new SpaceInvaders.LastEnemy();
     let protectionsContainer = new fCore.Node("protectionsContainer");
     let protectionContainer = new fCore.Node("protectionNode");
+    let invadersSpeedFactor = 0.076;
+    let invadersCounter = 0;
     let invadersContainer = new fCore.Node("invadersContainer");
     function init(_event) {
         let canvas = document.querySelector("canvas");
@@ -37,7 +41,7 @@ var SpaceInvaders;
             protectionContainer.mtxLocal.translateY(-0.5);
             for (let i = 0; i < 4; i++) {
                 for (let j = 0; j < 4; j++) {
-                    let protectionStripe = new SpaceInvaders.ProtectionsStripes("ProtectionsStripe", new fCore.Vector2(i / 12.5, j / 12.5), new fCore.Vector2(0.05, 0.05));
+                    let protectionStripe = new SpaceInvaders.ProtectionsStripes("ProtectionsStripe", new fCore.Vector2(i / 12.5, j / 12.5));
                     protectionContainer.appendChild(protectionStripe);
                 }
             }
@@ -46,7 +50,7 @@ var SpaceInvaders;
         translationX = 0;
         invadersContainer.addComponent(new fCore.ComponentTransform);
         invadersContainer.mtxLocal.translateX(-1.675);
-        invadersContainer.mtxLocal.translateY(0.8);
+        invadersContainer.mtxLocal.translateY(0.9);
         for (let i = 0; i < 48; i++) {
             translationX += 0.2;
             if (i % 16 == 0) {
@@ -70,20 +74,20 @@ var SpaceInvaders;
         SpaceInvaders.deltaTime = fCore.Loop.timeFrameGame / 1000;
         shootTimer -= SpaceInvaders.deltaTime;
         handlePlayerMovement();
-        handleEnemyMovement();
+        handleEnemyAndInvadersMovement();
         checkProjectileCollision();
         checkCollisionOfQuadStripes();
         SpaceInvaders.viewport.draw();
     }
     function handlePlayerMovement() {
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && SpaceInvaders.mainPlayerShip.mtxLocal.translation.x > -1.5)
-            SpaceInvaders.mainPlayerShip.mtxLocal.translateX(2 * -SpaceInvaders.movementSpeed * fCore.Loop.timeFrameReal);
+            SpaceInvaders.mainPlayerShip.mtxLocal.translateX(-SpaceInvaders.movementSpeed * SpaceInvaders.deltaTime);
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && SpaceInvaders.mainPlayerShip.mtxLocal.translation.x < 1.5)
-            SpaceInvaders.mainPlayerShip.mtxLocal.translateX(2 * SpaceInvaders.movementSpeed * fCore.Loop.timeFrameReal);
+            SpaceInvaders.mainPlayerShip.mtxLocal.translateX(SpaceInvaders.movementSpeed * SpaceInvaders.deltaTime);
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]) && shootTimer <= 0) {
             let projectileChildNode = new SpaceInvaders.Projectile();
             SpaceInvaders.projectilesContainer.addChild(projectileChildNode);
-            shootTimer = 0.1;
+            shootTimer = 0.4;
         }
         //PROJEKTILE SKRIPT
         //verinfachte Schreibweise
@@ -94,21 +98,42 @@ var SpaceInvaders;
                 SpaceInvaders.projectilesContainer.removeChild(projectile);
         }
     }
-    function handleEnemyMovement() {
-        if (lastEnemy.mtxLocal.translation.x > -1.45 && !isLeft) {
+    function handleEnemyAndInvadersMovement() {
+        if (lastEnemy.mtxLocal.translation.x > -1.45 && !isLeftEnemy) {
             if (lastEnemy.mtxLocal.translation.x < -1.4) {
-                isLeft = true;
-                isRight = false;
+                isLeftEnemy = true;
+                isRightEnemy = false;
             }
-            lastEnemy.mtxLocal.translateX(-SpaceInvaders.movementSpeed * fCore.Loop.timeFrameReal);
+            lastEnemy.mtxLocal.translateX(-SpaceInvaders.movementSpeed * SpaceInvaders.deltaTime);
         }
-        if (lastEnemy.mtxLocal.translation.x < 1.45 && !isRight) {
+        if (lastEnemy.mtxLocal.translation.x < 1.45 && !isRightEnemy) {
             if (lastEnemy.mtxLocal.translation.x > 1.4) {
-                isLeft = false;
-                isRight = true;
+                isLeftEnemy = false;
+                isRightEnemy = true;
             }
-            lastEnemy.mtxLocal.translateX(SpaceInvaders.movementSpeed * fCore.Loop.timeFrameReal);
+            lastEnemy.mtxLocal.translateX(SpaceInvaders.movementSpeed * SpaceInvaders.deltaTime);
         }
+        if (invadersContainer.mtxLocal.translation.x > -1.8 && !isLeftInvaders) {
+            if (invadersContainer.mtxLocal.translation.x < -1.75) {
+                invadersCounter++;
+                isLeftInvaders = true;
+                isRightInvaders = false;
+            }
+            invadersContainer.mtxLocal.translateX(-invadersSpeedFactor * SpaceInvaders.deltaTime);
+        }
+        if (invadersContainer.mtxLocal.translation.x < -1.5 && !isRightInvaders) {
+            if (invadersContainer.mtxLocal.translation.x > -1.6) {
+                invadersCounter++;
+                isLeftInvaders = false;
+                isRightInvaders = true;
+            }
+            invadersContainer.mtxLocal.translateX(invadersSpeedFactor * SpaceInvaders.deltaTime);
+        }
+        if (invadersCounter != 0)
+            if (invadersCounter % 4 == 0) {
+                invadersSpeedFactor += 0.00025;
+                invadersContainer.mtxLocal.translateY(-0.0001);
+            }
     }
     function checkProjectileCollision() {
         for (let projectile of SpaceInvaders.projectilesContainer.getChildren()) {

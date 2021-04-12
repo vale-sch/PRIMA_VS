@@ -25,7 +25,7 @@ namespace SpaceInvaders {
             } else if (this.name == "Invader")
                 this.rect = new fCore.Rectangle(_pos.x - 1.675, _pos.y + 0.85, _scale.x, _scale.y, fCore.ORIGIN2D.CENTER);
             else if (this.name == "ProtectionStripe") {
-                this.rect = new fCore.Rectangle(_pos.x, _pos.y - 0.5, _scale.x, _scale.y, fCore.ORIGIN2D.CENTER);
+                this.rect = new fCore.Rectangle(_pos.x, _pos.y - 1, _scale.x, _scale.y, fCore.ORIGIN2D.CENTER);
             }
             this.addComponent(this.cmpQuad);
             this.addComponent(new fCore.ComponentMaterial(randomColorMat));
@@ -35,8 +35,8 @@ namespace SpaceInvaders {
             return this.rect.collides(_target.rect);
         }
         public setRectPosition(): void {
-            this.rect.position.x = this.mtxWorld.translation.x;
-            this.rect.position.y = this.mtxWorld.translation.y;
+            this.rect.position.x = this.mtxLocal.translation.x - this.rect.size.x / 2;
+            this.rect.position.y = this.mtxLocal.translation.y - this.rect.size.y / 2;
         }
     }
 }

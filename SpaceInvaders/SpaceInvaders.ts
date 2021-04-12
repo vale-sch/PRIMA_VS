@@ -7,15 +7,18 @@ namespace SpaceInvaders {
     export let mainPlayerShip: fCore.Node = new Player();
     export let projectilesContainer: fCore.Node = new fCore.Node("projectilesContainer");
     export let deltaTime: number;
-    export let movementSpeed: number = 0.0005;
+    export let movementSpeed: number = 0.5;
 
-    let isRight: boolean = true;
-    let isLeft: boolean = false;
+    let isRightEnemy: boolean = true;
+    let isLeftEnemy: boolean = false;
+    let isRightInvaders: boolean = true;
+    let isLeftInvaders: boolean = false;
     let shootTimer: number = 2;
     let lastEnemy: fCore.Node = new LastEnemy();
     let protectionsContainer: fCore.Node = new fCore.Node("protectionsContainer");
     let protectionContainer: fCore.Node = new fCore.Node("protectionNode");
-
+    let invadersSpeedFactor: number = 0.076;
+    let invadersCounter: number = 0;
     let invadersContainer: fCore.Node = new fCore.Node("invadersContainer");
 
     function init(_event: Event): void {
@@ -48,7 +51,7 @@ namespace SpaceInvaders {
 
             for (let i: number = 0; i < 4; i++) {
                 for (let j: number = 0; j < 4; j++) {
-                    let protectionStripe: ProtectionsStripes = new ProtectionsStripes("ProtectionsStripe", new fCore.Vector2(i / 12.5, j / 12.5), new fCore.Vector2(0.05, 0.05));
+                    let protectionStripe: ProtectionsStripes = new ProtectionsStripes("ProtectionsStripe", new fCore.Vector2(i / 12.5, j / 12.5));
                     protectionContainer.appendChild(protectionStripe);
                 }
             }
@@ -57,7 +60,7 @@ namespace SpaceInvaders {
         translationX = 0;
         invadersContainer.addComponent(new fCore.ComponentTransform);
         invadersContainer.mtxLocal.translateX(-1.675);
-        invadersContainer.mtxLocal.translateY(0.8);
+        invadersContainer.mtxLocal.translateY(0.9);
         for (let i: number = 0; i < 48; i++) {
             translationX += 0.2;
             if (i % 16 == 0) {
@@ -85,7 +88,7 @@ namespace SpaceInvaders {
 
         handlePlayerMovement();
 
-        handleEnemyMovement();
+        handleEnemyAndInvadersMovement();
 
         checkProjectileCollision();
         checkCollisionOfQuadStripes();
@@ -96,14 +99,14 @@ namespace SpaceInvaders {
 
     function handlePlayerMovement(): void {
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.A, fCore.KEYBOARD_CODE.ARROW_LEFT]) && mainPlayerShip.mtxLocal.translation.x > -1.5)
-            mainPlayerShip.mtxLocal.translateX(2 * -movementSpeed * fCore.Loop.timeFrameReal);
+            mainPlayerShip.mtxLocal.translateX(-movementSpeed * deltaTime);
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.D, fCore.KEYBOARD_CODE.ARROW_RIGHT]) && mainPlayerShip.mtxLocal.translation.x < 1.5)
-            mainPlayerShip.mtxLocal.translateX(2 * movementSpeed * fCore.Loop.timeFrameReal);
+            mainPlayerShip.mtxLocal.translateX(movementSpeed * deltaTime);
 
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]) && shootTimer <= 0) {
             let projectileChildNode: fCore.Node = new Projectile();
             projectilesContainer.addChild(projectileChildNode);
-            shootTimer = 0.1;
+            shootTimer = 0.4;
         }
         //PROJEKTILE SKRIPT
         //verinfachte Schreibweise
@@ -115,21 +118,42 @@ namespace SpaceInvaders {
         }
     }
 
-    function handleEnemyMovement(): void {
-        if (lastEnemy.mtxLocal.translation.x > -1.45 && !isLeft) {
+    function handleEnemyAndInvadersMovement(): void {
+        if (lastEnemy.mtxLocal.translation.x > -1.45 && !isLeftEnemy) {
             if (lastEnemy.mtxLocal.translation.x < -1.4) {
-                isLeft = true;
-                isRight = false;
+                isLeftEnemy = true;
+                isRightEnemy = false;
             }
-            lastEnemy.mtxLocal.translateX(-movementSpeed * fCore.Loop.timeFrameReal);
+            lastEnemy.mtxLocal.translateX(-movementSpeed * deltaTime);
         }
-        if (lastEnemy.mtxLocal.translation.x < 1.45 && !isRight) {
+        if (lastEnemy.mtxLocal.translation.x < 1.45 && !isRightEnemy) {
             if (lastEnemy.mtxLocal.translation.x > 1.4) {
-                isLeft = false;
-                isRight = true;
+                isLeftEnemy = false;
+                isRightEnemy = true;
             }
-            lastEnemy.mtxLocal.translateX(movementSpeed * fCore.Loop.timeFrameReal);
+            lastEnemy.mtxLocal.translateX(movementSpeed * deltaTime);
         }
+        if (invadersContainer.mtxLocal.translation.x > -1.8 && !isLeftInvaders) {
+            if (invadersContainer.mtxLocal.translation.x < -1.75) {
+                invadersCounter++;
+                isLeftInvaders = true;
+                isRightInvaders = false;
+            }
+            invadersContainer.mtxLocal.translateX(-invadersSpeedFactor * deltaTime);
+        }
+        if (invadersContainer.mtxLocal.translation.x < -1.5 && !isRightInvaders) {
+            if (invadersContainer.mtxLocal.translation.x > -1.6) {
+                invadersCounter++;
+                isLeftInvaders = false;
+                isRightInvaders = true;
+            }
+            invadersContainer.mtxLocal.translateX(invadersSpeedFactor * deltaTime);
+        }
+        if (invadersCounter != 0)
+            if (invadersCounter % 4 == 0) {
+                invadersSpeedFactor += 0.00025;
+                invadersContainer.mtxLocal.translateY(-0.0001);
+            }
     }
     function checkProjectileCollision(): void {
         for (let projectile of projectilesContainer.getChildren() as Projectile[]) {
