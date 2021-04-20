@@ -151,7 +151,11 @@ declare namespace FudgeCore {
         /** dispatched to [[FileIo]] when a list of files has been loaded  */
         FILE_LOADED = "fileLoaded",
         /** dispatched to [[FileIo]] when a list of files has been saved */
-        FILE_SAVED = "fileSaved"
+        FILE_SAVED = "fileSaved",
+        /** dispatched to [[Node]] when recalculating transforms for render */
+        RENDER_PREPARE = "renderPrepare",
+        RENDER_PREPARE_START = "renderPrepareStart",
+        RENDER_PREPARE_END = "renderPrepareEnd"
     }
     type Eventƒ = EventPointer | EventDragDrop | EventWheel | EventKeyboard | Event | EventPhysics;
     type EventListenerƒ = ((_event: EventPointer) => void) | ((_event: EventDragDrop) => void) | ((_event: EventWheel) => void) | ((_event: EventKeyboard) => void) | ((_event: Eventƒ) => void) | ((_event: EventPhysics) => void) | EventListenerObject;
@@ -707,7 +711,7 @@ declare namespace FudgeCore {
      * Base class for RenderManager, handling the connection to the rendering system, in this case WebGL.
      * Methods and attributes of this class should not be called directly, only through [[RenderManager]]
      */
-    abstract class RenderWebGL {
+    abstract class RenderWebGL extends EventTargetStatic {
         protected static crc3: WebGL2RenderingContext;
         protected static ƒpicked: Pick[];
         private static rectRender;
@@ -945,9 +949,12 @@ declare namespace FudgeCore {
          * Dispatches a synthetic event to target. This implementation always returns true (standard: return true only if either event's cancelable attribute value is false or its preventDefault() method was not invoked)
          * The event travels into the hierarchy to this node dispatching the event, invoking matching handlers of the nodes ancestors listening to the capture phase,
          * than the matching handler of the target node in the target phase, and back out of the hierarchy in the bubbling phase, invoking appropriate handlers of the anvestors
-         * @param _event The event to dispatch
          */
         dispatchEvent(_event: Event): boolean;
+        /**
+         * Dispatches a synthetic event to target without travelling through the graph hierarchy neither during capture nor bubbling phase
+         */
+        dispatchEventToTargetOnly(_event: Event): boolean;
         /**
          * Broadcasts a synthetic event to this node and from there to all nodes deeper in the hierarchy,
          * invoking matching handlers of the nodes listening to the capture phase. Watch performance when there are many nodes involved
@@ -955,6 +962,7 @@ declare namespace FudgeCore {
          */
         broadcastEvent(_event: Event): void;
         private broadcastEventRecursive;
+        private callListeners;
     }
 }
 declare namespace FudgeCore {
@@ -981,10 +989,34 @@ declare namespace FudgeCore {
         [name: string]: number;
     }
     /**
+     * Holds different playmodes the animation uses to play back its animation.
+     * @author Lukas Scheuerle, HFU, 2019
+     */
+    enum ANIMATION_PLAYMODE {
+        /**Plays animation in a loop: it restarts once it hit the end.*/
+        LOOP = 0,
+        /**Plays animation once and stops at the last key/frame*/
+        PLAYONCE = 1,
+        /**Plays animation once and stops on the first key/frame */
+        PLAYONCESTOPAFTER = 2,
+        /**Plays animation like LOOP, but backwards.*/
+        REVERSELOOP = 3,
+        /**Causes the animation not to play at all. Useful for jumping to various positions in the animation without proceeding in the animation.*/
+        STOP = 4
+    }
+    enum ANIMATION_PLAYBACK {
+        /**Calculates the state of the animation at the exact position of time. Ignores FPS value of animation.*/
+        TIMEBASED_CONTINOUS = 0,
+        /**Limits the calculation of the state of the animation to the FPS value of the animation. Skips frames if needed.*/
+        TIMEBASED_RASTERED_TO_FPS = 1,
+        /**Uses the FPS value of the animation to advance once per frame, no matter the speed of the frames. Doesn't skip any frames.*/
+        FRAMEBASED = 2
+    }
+    /**
      * Animation Class to hold all required Objects that are part of an Animation.
      * Also holds functions to play said Animation.
      * Can be added to a Node and played through [[ComponentAnimator]].
-     * @author Lukas Scheuerle, HFU, 2019
+     * @author Lukas Scheuerle, HFU, 2019 | Jirka Dell'Oro-Friedl, HFU, 2021
      */
     class Animation extends Mutable implements SerializableResource {
         idResource: string;
@@ -1033,6 +1065,16 @@ declare namespace FudgeCore {
          * (Re-)Calculate the total time of the Animation. Calculation-heavy, use only if actually needed.
          */
         calculateTotalTime(): void;
+        /**
+         * Returns the time to use for animation sampling when applying a playmode
+         */
+        getModalTime(_time: number, _playmode: ANIMATION_PLAYMODE, _timeStop?: number): number;
+        /**
+         * Calculates and returns the direction the animation should currently be playing in.
+         * @param _time the time at which to calculate the direction
+         * @returns 1 if forward, 0 if stop, -1 if backwards
+         */
+        calculateDirection(_time: number, _playmode: ANIMATION_PLAYMODE): number;
         serialize(): Serialization;
         deserialize(_serialization: Serialization): Promise<Serializable>;
         getMutator(): Mutator;
@@ -1344,30 +1386,6 @@ declare namespace FudgeCore {
 }
 declare namespace FudgeCore {
     /**
-     * Holds different playmodes the animation uses to play back its animation.
-     * @author Lukas Scheuerle, HFU, 2019
-     */
-    enum ANIMATION_PLAYMODE {
-        /**Plays animation in a loop: it restarts once it hit the end.*/
-        LOOP = 0,
-        /**Plays animation once and stops at the last key/frame*/
-        PLAYONCE = 1,
-        /**Plays animation once and stops on the first key/frame */
-        PLAYONCESTOPAFTER = 2,
-        /**Plays animation like LOOP, but backwards.*/
-        REVERSELOOP = 3,
-        /**Causes the animation not to play at all. Useful for jumping to various positions in the animation without proceeding in the animation.*/
-        STOP = 4
-    }
-    enum ANIMATION_PLAYBACK {
-        /**Calculates the state of the animation at the exact position of time. Ignores FPS value of animation.*/
-        TIMEBASED_CONTINOUS = 0,
-        /**Limits the calculation of the state of the animation to the FPS value of the animation. Skips frames if needed.*/
-        TIMEBASED_RASTERED_TO_FPS = 1,
-        /**Uses the FPS value of the animation to advance once per frame, no matter the speed of the frames. Doesn't skip any frames.*/
-        FRAMEBASED = 2
-    }
-    /**
      * Holds a reference to an [[Animation]] and controls it. Controls playback and playmode as well as speed.
      * @authors Lukas Scheuerle, HFU, 2019
      */
@@ -1382,9 +1400,9 @@ declare namespace FudgeCore {
         private lastTime;
         constructor(_animation?: Animation, _playmode?: ANIMATION_PLAYMODE, _playback?: ANIMATION_PLAYBACK);
         set speed(_s: number);
+        activate(_on: boolean): void;
         /**
          * Jumps to a certain time in the animation to play from there.
-         * @param _time The time to jump to
          */
         jumpTo(_time: number): void;
         /**
@@ -1411,18 +1429,11 @@ declare namespace FudgeCore {
          * @param events a list of names of custom events to fire
          */
         private executeEvents;
-        /**
+        /**   MOVED TO ANIMATION, TODO: delete
          * Calculates the actual time to use, using the current playmodes.
          * @param _time the time to apply the playmodes to
          * @returns the recalculated time
          */
-        private applyPlaymodes;
-        /**
-         * Calculates and returns the direction the animation should currently be playing in.
-         * @param _time the time at which to calculate the direction
-         * @returns 1 if forward, 0 if stop, -1 if backwards
-         */
-        private calculateDirection;
         /**
          * Updates the scale of the animation if the user changes it or if the global game timer changed its scale.
          */
@@ -1683,10 +1694,6 @@ declare namespace FudgeCore {
 }
 declare namespace FudgeCore {
     /**
-     * Attaches a [[Light]] to the node
-     * @authors Jirka Dell'Oro-Friedl, HFU, 2019
-     */
-    /**
      * Defines identifiers for the various types of light this component can provide.
      */
     enum LIGHT_TYPE {
@@ -1695,6 +1702,10 @@ declare namespace FudgeCore {
         POINT = "LightPoint",
         SPOT = "LightSpot"
     }
+    /**
+      * Attaches a [[Light]] to the node
+      * @authors Jirka Dell'Oro-Friedl, HFU, 2019
+      */
     class ComponentLight extends Component {
         static readonly iSubclass: number;
         mtxPivot: Matrix4x4;
@@ -1988,6 +1999,9 @@ declare namespace FudgeCore {
         END = "\u0192dragend",
         OVER = "\u0192dragover"
     }
+    /**
+     * a subclass of DragEvent .A event that represents a drag and drop interaction
+     */
     class EventDragDrop extends DragEvent {
         pointerX: number;
         pointerY: number;
@@ -1998,6 +2012,10 @@ declare namespace FudgeCore {
     }
 }
 declare namespace FudgeCore {
+    /**
+     * a subclass of KeyboardEvent. EventKeyboard objects describe a user interaction with the keyboard
+     * each event describes a single interaction between the user and a key (or combination of a key with modifier keys) on the keyboard.
+     */
     class EventKeyboard extends KeyboardEvent {
         constructor(type: string, _event: EventKeyboard);
     }
@@ -2193,6 +2211,9 @@ declare namespace FudgeCore {
         GOTCAPTURE = "\u0192gotpointercapture",
         LOSTCAPTURE = "\u0192lostpointercapture"
     }
+    /**
+     * a subclass of PointerEvent. The state of a DOM event produced by a pointer such as the geometry of the contact point
+     * */
     class EventPointer extends PointerEvent {
         pointerX: number;
         pointerY: number;
@@ -2206,6 +2227,9 @@ declare namespace FudgeCore {
     const enum EVENT_TIMER {
         CALL = "\u0192lapse"
     }
+    /**
+     * An event that represents a call from a Timer
+     * */
     class EventTimer {
         type: EVENT_TIMER;
         target: Timer;
@@ -2220,6 +2244,9 @@ declare namespace FudgeCore {
     const enum EVENT_WHEEL {
         WHEEL = "\u0192wheel"
     }
+    /**
+     * A supclass of WheelEvent. Events that occur due to the user moving a mouse wheel or similar input device.
+     * */
     class EventWheel extends WheelEvent {
         constructor(type: string, _event: EventWheel);
     }
@@ -4193,7 +4220,7 @@ declare namespace FudgeCore {
     class ComponentRigidbody extends Component {
         static readonly iSubclass: number;
         /** The pivot of the physics itself. Default the pivot is identical to the transform. It's used like an offset. */
-        pivot: Matrix4x4;
+        mtxPivot: Matrix4x4;
         /** Vertices that build a convex mesh (form that is in itself closed). Needs to set in the construction of the rb if none of the standard colliders is used. */
         convexMesh: Float32Array;
         /** Collisions with rigidbodies happening to this body, can be used to build a custom onCollisionStay functionality. */
@@ -4220,7 +4247,7 @@ declare namespace FudgeCore {
         private rotationalInfluenceFactor;
         private gravityInfluenceFactor;
         /** Creating a new rigidbody with a weight in kg, a physics type (default = dynamic), a collider type what physical form has the collider, to what group does it belong, is there a transform Matrix that should be used, and is the collider defined as a group of points that represent a convex mesh. */
-        constructor(_mass?: number, _type?: PHYSICS_TYPE, _colliderType?: COLLIDER_TYPE, _group?: PHYSICS_GROUP, _transform?: Matrix4x4, _convexMesh?: Float32Array);
+        constructor(_mass?: number, _type?: PHYSICS_TYPE, _colliderType?: COLLIDER_TYPE, _group?: PHYSICS_GROUP, _mtxTransform?: Matrix4x4, _convexMesh?: Float32Array);
         /** The type of interaction between the physical world and the transform hierarchy world. DYNAMIC means the body ignores hierarchy and moves by physics. KINEMATIC it's
          * reacting to a [[Node]] that is using physics but can still be controlled by animation or transform. And STATIC means its immovable.
          */
@@ -4277,6 +4304,13 @@ declare namespace FudgeCore {
         * is not provided through the FUDGE Integration.
         */
         getOimoRigidbody(): OIMO.RigidBody;
+        /** Rotating the rigidbody therefore changing it's rotation over time directly in physics. This way physics is changing instead of transform.
+     *  But you are able to incremental changing it instead of a direct rotation.  Although it's always prefered to use forces in physics.
+    */
+        rotateBody(_rotationChange: Vector3): void;
+        /** Translating the rigidbody therefore changing it's place over time directly in physics. This way physics is changing instead of transform.
+         *  But you are able to incremental changing it instead of a direct position. Although it's always prefered to use forces in physics. */
+        translateBody(_translationChange: Vector3): void;
         /**
        * Checking for Collision with other Colliders and dispatches a custom event with information about the collider.
        * Automatically called in the RenderManager, no interaction needed.
@@ -4300,13 +4334,17 @@ declare namespace FudgeCore {
       */
         setPosition(_value: Vector3): void;
         /**
-         * Get the current ROTATION of the [[Node]] in the physical space
+         * Get the current ROTATION of the [[Node]] in the physical space. Note this range from -pi to pi, so -90 to 90.
          */
         getRotation(): Vector3;
         /**
          * Sets the current ROTATION of the [[Node]] in the physical space, in degree.
          */
         setRotation(_value: Vector3): void;
+        /** Get the current SCALING in the physical space. */
+        getScaling(): Vector3;
+        /** Sets the current SCALING of the [[Node]] in the physical space. Also applying this scaling to the node itself. */
+        setScaling(_value: Vector3): void;
         /**
         * Get the current VELOCITY of the [[Node]]
         */
@@ -4316,9 +4354,17 @@ declare namespace FudgeCore {
          */
         setVelocity(_value: Vector3): void;
         /**
-         * Applies a continous FORCE at the center of the RIGIDBODY in the three dimensions. Considering the rigidbody's MASS.
-         * The force is measured in newton, 1kg needs about 10 Newton to fight against gravity.
-         */
+    * Get the current ANGULAR - VELOCITY of the [[Node]]
+    */
+        getAngularVelocity(): Vector3;
+        /**
+       * Sets the current ANGULAR - VELOCITY of the [[Node]]
+       */
+        setAngularVelocity(_value: Vector3): void;
+        /**
+        * Applies a continous FORCE at the center of the RIGIDBODY in the three dimensions. Considering the rigidbody's MASS.
+        * The force is measured in newton, 1kg needs about 10 Newton to fight against gravity.
+        */
         applyForce(_force: Vector3): void;
         /**
         * Applies a continous FORCE at a specific point in the world to the RIGIDBODY in the three dimensions. Considering the rigidbody's MASS
@@ -4381,6 +4427,10 @@ declare namespace FudgeCore {
          * Events in case a body is in a trigger, so not only the body registers a triggerEvent but also the trigger itself.
          */
         private checkBodiesInTrigger;
+        private collisionCenterPoint;
+        /** Change properties thorugh a associative array */
+        mutate(_mutator: Mutator): Promise<void>;
+        reduceMutator(_mutator: Mutator): void;
     }
 }
 declare namespace FudgeCore {
@@ -4398,10 +4448,6 @@ declare namespace FudgeCore {
         constructor(_renderingContext: WebGL2RenderingContext);
         /** Fill the bound buffer with data. Used at buffer initialization */
         setData(array: Array<number>): void;
-        /** Update the data in the buffer */
-        updateData(array: Array<number>): void;
-        /** Update the buffer with the specific type of Float32Array */
-        updateDataFloat32Array(array: Float32Array): void;
         /** Set Shader Attributes informations by getting their position in the shader, setting the offset, stride and size. For later use in the binding process */
         setAttribs(attribs: Array<PhysicsDebugVertexAttribute>): void;
         /** Get the position of the attribute in the shader */
@@ -4418,10 +4464,6 @@ declare namespace FudgeCore {
         constructor(_renderingContext: WebGL2RenderingContext);
         /** Fill the bound buffer with data amount. Used at buffer initialization */
         setData(array: Array<number>): void;
-        /** Update the actual data in the buffer */
-        updateData(array: Array<number>): void;
-        /** Update the buffer with the specific type of Int16Array */
-        updateDataInt16Array(array: Int16Array): void;
         /** The actual DrawCall for physicsDebugDraw Buffers. This is where the information from the debug is actually drawn. */
         draw(_mode?: number, _count?: number): void;
     }
@@ -4466,14 +4508,14 @@ declare namespace FudgeCore {
         lineIBO: PhysicsDebugIndexBuffer;
         triVBO: PhysicsDebugVertexBuffer;
         triIBO: PhysicsDebugIndexBuffer;
-        pointBufferSize: number;
-        pointData: Float32Array;
+        pointData: Array<number>;
+        pointIboData: Array<number>;
         numPointData: number;
-        lineBufferSize: number;
-        lineData: Float32Array;
+        lineData: Array<number>;
+        lineIboData: Array<number>;
         numLineData: number;
-        triBufferSize: number;
-        triData: Float32Array;
+        triData: Array<number>;
+        triIboData: Array<number>;
         numTriData: number;
         /** Creating the debug for physics in Fudge. Tell it to draw only wireframe objects, since Fudge is handling rendering of the objects besides physics.
          * Override OimoPhysics Functions with own rendering. Initialize buffers and connect them with the context for later use. */
@@ -4483,20 +4525,18 @@ declare namespace FudgeCore {
          * to debug only what they need and is commonly debugged.
          */
         getDebugModeFromSettings(): void;
-        /** Creating the render buffers for later use. Defining the attributes used in shaders.
-         * Needs to create empty buffers to already have them ready to draw later on, linking is only possible with existing buffers. No performance loss because empty buffers are not drawn.*/
+        /** Creating the empty render buffers. Defining the attributes used in shaders.
+         * Needs to create empty buffers to already have them ready to draw later on, linking is only possible with existing buffers. */
         initializeBuffers(): void;
+        /** Overriding the existing functions from OimoPhysics.DebugDraw without actually inherit from the class, to avoid compiler problems.
+         * Overriding them to receive debugInformations in the format the physic engine provides them but handling the rendering in the fudge context. */
+        private initializeOverride;
         /** Before OimoPhysics.world is filling the debug. Make sure the buffers are reset. Also receiving the debugMode from settings and updating the current projection for the vertexShader. */
         begin(): void;
         /** After OimoPhysics.world filled the debug. Rendering calls. Setting this program to be used by the Fudge rendering context. And draw each updated buffer and resetting them. */
         end(): void;
         /** Drawing the ray into the debugDraw Call. By using the overwritten line rendering functions and drawing a point (pointSize defined in the shader) at the end of the ray. */
         debugRay(_origin: Vector3, _end: Vector3, _color: Color): void;
-        /** Fill an array with empty values */
-        private initFloatArray;
-        /** Overriding the existing functions from OimoPhysics.DebugDraw without actually inherit from the class, to avoid compiler problems.
-         * Overriding them to receive debugInformations in the format the physic engine provides them but handling the rendering in the fudge context. */
-        private initializeOverride;
         /** The source code (string) of the in physicsDebug used very simple vertexShader.
          *  Handling the projection (which includes, view/world[is always identity in this case]/projection in Fudge). Increasing the size of single points drawn.
          *  And transfer position color to the fragmentShader. */
@@ -4531,8 +4571,10 @@ declare namespace FudgeCore {
         binomalImpulse: number;
         /** The point where the collision/triggering initially happened. The collision point exists only on COLLISION_ENTER / TRIGGER_ENTER. */
         collisionPoint: Vector3;
+        /** The normal vector of the collision. Only existing on COLLISION_ENTER */
+        collisionNormal: Vector3;
         /** Creates a new event customized for physics. Holding informations about impulses. Collision point and the body that is colliding */
-        constructor(_type: EVENT_PHYSICS, _hitRigidbody: ComponentRigidbody, _normalImpulse: number, _tangentImpulse: number, _binormalImpulse: number, _collisionPoint?: Vector3);
+        constructor(_type: EVENT_PHYSICS, _hitRigidbody: ComponentRigidbody, _normalImpulse: number, _tangentImpulse: number, _binormalImpulse: number, _collisionPoint?: Vector3, _collisionNormal?: Vector3);
     }
     /**
   * Groups to place a node in, not every group should collide with every group. Use a Mask in to exclude collisions
@@ -4596,7 +4638,6 @@ declare namespace FudgeCore {
         /** Whether the debug informations of the physics should be displayed or not (default = false) */
         debugDraw: boolean;
         private physicsDebugMode;
-        constructor(_defGroup: number, _defMask: number);
         get debugMode(): PHYSICS_DEBUGMODE;
         set debugMode(_value: PHYSICS_DEBUGMODE);
         /** Change if rigidbodies are able to sleep (don't be considered in physical calculations) when their movement is below a threshold. Deactivation is decreasing performance for minor advantage in precision. */
@@ -4626,8 +4667,16 @@ declare namespace FudgeCore {
         get defaultCollisionMask(): number;
         set defaultCollisionMask(_value: number);
         /** The group that this rigidbody belongs to. Default is the DEFAULT Group which means its just a normal Rigidbody not a trigger nor anything special. */
-        get defaultCollisionGroup(): number;
-        set defaultCollisionGroup(_value: number);
+        get defaultCollisionGroup(): PHYSICS_GROUP;
+        set defaultCollisionGroup(_value: PHYSICS_GROUP);
+        /** Change the type of joint solver algorithm. Default Iterative == 0, is faster but less stable. Direct == 1, slow but more stable, recommended for complex joint work. Change this setting only at the start of your game. */
+        get defaultConstraintSolverType(): number;
+        set defaultConstraintSolverType(_value: number);
+        /** The correction algorithm used to correct physics calculations. Change this only at the beginning of your game. Each has different approaches, so if you have problems test another
+         *  Default 0 = Baumgarte (fast but less correct induces some energy errors), 1 = Split-Impulse (fast and no engery errors, but more inaccurate for joints), 2 = Non-linear Gauss Seidel (slowest but most accurate)*/
+        get defaultCorrectionAlgorithm(): number;
+        set defaultCorrectionAlgorithm(_value: number);
+        constructor(_defGroup: number, _defMask: number);
     }
 }
 declare namespace FudgeCore {
@@ -4704,6 +4753,8 @@ declare namespace FudgeCore {
         * Removing a OIMO Joint/Constraint to the OIMO World, happens automatically when removeing a FUDGE Joint Component
         */
         removeJoint(_cmpJoint: ComponentJoint): void;
+        /** Returns the actual used world of the OIMO physics engine. No user interaction needed.*/
+        getOimoWorld(): OIMO.World;
         /**
       * Simulates the physical world. _deltaTime is the amount of time between physical steps, default is 60 frames per second ~17ms
       */
@@ -5382,18 +5433,15 @@ declare namespace FudgeCore {
      * @author Jirka Dell'Oro-Friedl, HFU, 2019
      */
     class Loop extends EventTargetStatic {
-        /** The gametime the loop was started, overwritten at each start */
-        static timeStartGame: number;
-        /** The realtime the loop was started, overwritten at each start */
-        static timeStartReal: number;
-        /** The gametime elapsed since the last loop cycle */
-        static timeFrameGame: number;
-        /** The realtime elapsed since the last loop cycle */
-        static timeFrameReal: number;
-        private static timeLastFrameGame;
-        private static timeLastFrameReal;
-        private static timeLastFrameGameAvg;
-        private static timeLastFrameRealAvg;
+        private static ƒTimeStartGame;
+        private static ƒTimeStartReal;
+        private static ƒTimeFrameGame;
+        private static ƒTimeFrameReal;
+        private static ƒTimeFrameStartGame;
+        private static ƒTimeFrameStartReal;
+        private static ƒTimeLastFrameGameAvg;
+        private static ƒTimeLastFrameRealAvg;
+        private static ƒFrames;
         private static running;
         private static mode;
         private static idIntervall;
@@ -5401,6 +5449,24 @@ declare namespace FudgeCore {
         private static fpsDesired;
         private static framesToAverage;
         private static syncWithAnimationFrame;
+        /** The gametime the loop was started, overwritten at each start */
+        static get timeStartGame(): number;
+        /** The realtime the loop was started, overwritten at each start */
+        static get timeStartReal(): number;
+        /** The gametime elapsed since the last loop cycle */
+        static get timeFrameGame(): number;
+        /** The realtime elapsed since the last loop cycle */
+        static get timeFrameReal(): number;
+        /** The gametime the last loop cycle started*/
+        static get timeFrameStartGame(): number;
+        /** The realtime the last loop cycle started*/
+        static get timeFrameStartReal(): number;
+        /** The average number of frames per second in gametime */
+        static get fpsGameAverage(): number;
+        /** The average number of frames per second in realtime */
+        static get fpsRealAverage(): number;
+        /** The number of frames triggered so far */
+        static get frames(): number;
         /**
          * Starts the loop with the given mode and fps
          * @param _mode
@@ -5413,8 +5479,6 @@ declare namespace FudgeCore {
          */
         static stop(): void;
         static continue(): void;
-        static getFpsGameAverage(): number;
-        static getFpsRealAverage(): number;
         private static loop;
         private static loopFrame;
         private static loopTime;
