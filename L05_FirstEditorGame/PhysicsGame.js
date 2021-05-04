@@ -32,8 +32,10 @@ var L05_PhysicsGame;
         viewport.initialize("Viewport", root, cmpCamera, canvas);
         document.addEventListener("keypress", handler_Key_Pressed);
         document.addEventListener("keyup", handler_Key_Released);
+        //fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
+        //fCore.Loop.start();
         fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
-        fCore.Loop.start();
+        fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
     }
     function createAvatar() {
         cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);

@@ -37,8 +37,10 @@ namespace L05_PhysicsGame {
     document.addEventListener("keypress", handler_Key_Pressed);
     document.addEventListener("keyup", handler_Key_Released);
 
+    //fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
+    //fCore.Loop.start();
     fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
-    fCore.Loop.start();
+    fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
   }
 
   function createAvatar(): void {
@@ -50,7 +52,6 @@ namespace L05_PhysicsGame {
     avatarNode.addComponent(new fCore.ComponentTransform(fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(3))));
     avatarNode.addComponent(cmpAvatar);
     avatarNode.addComponent(cmpCamera);
-
     root.appendChild(avatarNode);
   }
 
