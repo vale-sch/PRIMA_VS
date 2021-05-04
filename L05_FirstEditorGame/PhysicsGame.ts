@@ -1,8 +1,10 @@
 namespace L05_PhysicsGame {
   import fCore = FudgeCore;
-  // import ƒAid = FudgeAid;
+  // import fAid = FudgeAid;
   let root: fCore.Graph;
   let cmpAvatar: fCore.ComponentRigidbody;
+  let cmpRigidbodyBall: fCore.ComponentRigidbody;
+  let ball: fCore.Node;
   let avatarNode: fCore.Node;
   let viewport: fCore.Viewport;
   let cmpCamera: fCore.ComponentCamera;
@@ -11,14 +13,13 @@ namespace L05_PhysicsGame {
   let forwardMovement: number = 0;
   let movementspeed: number = 12;
   let turningspeed: number = 200;
-  let playerJumpForce: number = 500;
+  let playerJumpForce: number = 750;
+  let kickStrength: number = 100;
   let isGrounded: boolean;
-
 
   window.addEventListener("load", start);
 
   async function start(_event: Event): Promise<void> {
-    fCore.Physics.settings.debugDraw = true;
 
     await FudgeCore.Project.loadResourcesFromHTML();
     // await FudgeCore.Project.loadResources("PhysicsGame.json");
@@ -41,7 +42,7 @@ namespace L05_PhysicsGame {
   }
 
   function createAvatar(): void {
-    cmpAvatar = new fCore.ComponentRigidbody(0.1, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
+    cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
     cmpAvatar.restitution = 0.5;
     cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
     cmpAvatar.friction = 1;
@@ -59,7 +60,20 @@ namespace L05_PhysicsGame {
     playerIsGroundedRaycast();
     player_Movement(fCore.Loop.timeFrameReal / 1000);
     viewport.draw();
-    fCore.Physics.settings.debugDraw = true;
+
+    if (ball == undefined) return;
+    if (ball.mtxWorld.translation.y < 0) {
+      cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
+      cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+      cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 6, 0));
+      ball.mtxWorld.translate(new fCore.Vector3(0, 6, 0));
+    }
+    if (avatarNode.mtxWorld.translation.y < 0) {
+      cmpAvatar.setVelocity(new fCore.Vector3(0, 0, 0));
+      cmpAvatar.setRotation(new fCore.Vector3(0, 0, 0));
+      cmpAvatar.setPosition(new fCore.Vector3(0, 6, 0));
+      avatarNode.mtxWorld.translate(new fCore.Vector3(0, 6, 0));
+    }
   }
 
   function createRigidbodies(): void {
@@ -68,15 +82,13 @@ namespace L05_PhysicsGame {
       let cmpRigidbody: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(0, fCore.PHYSICS_TYPE.STATIC, fCore.COLLIDER_TYPE.CUBE, fCore.PHYSICS_GROUP.DEFAULT);
       node.addComponent(cmpRigidbody);
     }
-    let ball: fCore.Node = root.getChildrenByName("ball")[0];
-    let cmpRigidbody: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(1, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
-    ball.addComponent(cmpRigidbody);
-
-
+    ball = root.getChildrenByName("ball")[0];
+    cmpRigidbodyBall = new fCore.ComponentRigidbody(25, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
+    ball.addComponent(cmpRigidbodyBall);
     fCore.Physics.adjustTransforms(root, true);
   }
-  function player_Movement(_deltaTime: number): void {
 
+  function player_Movement(_deltaTime: number): void {
     let playerForward: fCore.Vector3;
     playerForward = fCore.Vector3.Z();
     playerForward.transform(avatarNode.mtxWorld, false);
@@ -94,38 +106,55 @@ namespace L05_PhysicsGame {
 
   function handler_Key_Pressed(_event: KeyboardEvent): void {
     if (_event.code == fCore.KEYBOARD_CODE.A)
-      yTurn = 1;
+      yTurn = 0.66;
     if (_event.code == fCore.KEYBOARD_CODE.W)
-      forwardMovement = 1;
+      forwardMovement = 0.66;
     if (_event.code == fCore.KEYBOARD_CODE.S)
-      forwardMovement = -1;
+      forwardMovement = -0.66;
     if (_event.code == fCore.KEYBOARD_CODE.D)
-      yTurn = -1;
+      yTurn = -0.66;
+
     if (_event.code == fCore.KEYBOARD_CODE.SPACE)
       if (isGrounded)
         cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
+    if (cmpRigidbodyBall != undefined)
+      if (_event.code == fCore.KEYBOARD_CODE.E) {
+        let playerForward: fCore.Vector3;
+        playerForward = fCore.Vector3.Z();
+        playerForward.transform(avatarNode.mtxWorld, false);
+
+        // tslint:disable-next-line: typedef
+        let distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
+        if (distance.magnitude > 2.5)
+          return;
+        cmpRigidbodyBall.applyImpulseAtPoint(
+          new fCore.Vector3(playerForward.x * kickStrength / distance.magnitude, playerForward.y * kickStrength / distance.magnitude, playerForward.z * kickStrength / distance.magnitude),
+          avatarNode.mtxWorld.translation);
+      }
+
+    if (_event.code == fCore.KEYBOARD_CODE.T)
+      fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
+    if (_event.code == fCore.KEYBOARD_CODE.Y)
+      fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
   }
+
   function handler_Key_Released(_event: KeyboardEvent): void {
     if (_event.code == fCore.KEYBOARD_CODE.A)
       yTurn = 0;
-
     if (_event.code == fCore.KEYBOARD_CODE.W)
       forwardMovement = 0;
-
     if (_event.code == fCore.KEYBOARD_CODE.S)
       forwardMovement = 0;
-
     if (_event.code == fCore.KEYBOARD_CODE.D)
       yTurn = 0;
-
   }
+
   function playerIsGroundedRaycast(): void {
     let hitInfo: fCore.RayHitInfo;
     hitInfo = fCore.Physics.raycast(cmpAvatar.getPosition(), new fCore.Vector3(0, -1, 0), 1.1);
-    if (hitInfo.hit) {
+    if (hitInfo.hit)
       isGrounded = true;
-    } else {
+    else
       isGrounded = false;
-    }
   }
 }

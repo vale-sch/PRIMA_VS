@@ -2,9 +2,11 @@
 var L05_PhysicsGame;
 (function (L05_PhysicsGame) {
     var fCore = FudgeCore;
-    // import ƒAid = FudgeAid;
+    // import fAid = FudgeAid;
     let root;
     let cmpAvatar;
+    let cmpRigidbodyBall;
+    let ball;
     let avatarNode;
     let viewport;
     let cmpCamera;
@@ -12,11 +14,11 @@ var L05_PhysicsGame;
     let forwardMovement = 0;
     let movementspeed = 12;
     let turningspeed = 200;
-    let playerJumpForce = 500;
+    let playerJumpForce = 750;
+    let kickStrength = 100;
     let isGrounded;
     window.addEventListener("load", start);
     async function start(_event) {
-        fCore.Physics.settings.debugDraw = true;
         await FudgeCore.Project.loadResourcesFromHTML();
         // await FudgeCore.Project.loadResources("PhysicsGame.json");
         FudgeCore.Debug.log("Project:", FudgeCore.Project.resources);
@@ -34,7 +36,7 @@ var L05_PhysicsGame;
         fCore.Loop.start();
     }
     function createAvatar() {
-        cmpAvatar = new fCore.ComponentRigidbody(0.1, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
+        cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
         cmpAvatar.restitution = 0.5;
         cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
         cmpAvatar.friction = 1;
@@ -49,7 +51,20 @@ var L05_PhysicsGame;
         playerIsGroundedRaycast();
         player_Movement(fCore.Loop.timeFrameReal / 1000);
         viewport.draw();
-        fCore.Physics.settings.debugDraw = true;
+        if (ball == undefined)
+            return;
+        if (ball.mtxWorld.translation.y < 0) {
+            cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
+            cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+            cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 6, 0));
+            ball.mtxWorld.translate(new fCore.Vector3(0, 6, 0));
+        }
+        if (avatarNode.mtxWorld.translation.y < 0) {
+            cmpAvatar.setVelocity(new fCore.Vector3(0, 0, 0));
+            cmpAvatar.setRotation(new fCore.Vector3(0, 0, 0));
+            cmpAvatar.setPosition(new fCore.Vector3(0, 6, 0));
+            avatarNode.mtxWorld.translate(new fCore.Vector3(0, 6, 0));
+        }
     }
     function createRigidbodies() {
         let level = root.getChildrenByName("level")[0];
@@ -57,9 +72,9 @@ var L05_PhysicsGame;
             let cmpRigidbody = new fCore.ComponentRigidbody(0, fCore.PHYSICS_TYPE.STATIC, fCore.COLLIDER_TYPE.CUBE, fCore.PHYSICS_GROUP.DEFAULT);
             node.addComponent(cmpRigidbody);
         }
-        let ball = root.getChildrenByName("ball")[0];
-        let cmpRigidbody = new fCore.ComponentRigidbody(1, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
-        ball.addComponent(cmpRigidbody);
+        ball = root.getChildrenByName("ball")[0];
+        cmpRigidbodyBall = new fCore.ComponentRigidbody(25, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
+        ball.addComponent(cmpRigidbodyBall);
         fCore.Physics.adjustTransforms(root, true);
     }
     function player_Movement(_deltaTime) {
@@ -77,16 +92,31 @@ var L05_PhysicsGame;
     }
     function handler_Key_Pressed(_event) {
         if (_event.code == fCore.KEYBOARD_CODE.A)
-            yTurn = 1;
+            yTurn = 0.66;
         if (_event.code == fCore.KEYBOARD_CODE.W)
-            forwardMovement = 1;
+            forwardMovement = 0.66;
         if (_event.code == fCore.KEYBOARD_CODE.S)
-            forwardMovement = -1;
+            forwardMovement = -0.66;
         if (_event.code == fCore.KEYBOARD_CODE.D)
-            yTurn = -1;
+            yTurn = -0.66;
         if (_event.code == fCore.KEYBOARD_CODE.SPACE)
             if (isGrounded)
                 cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
+        if (cmpRigidbodyBall != undefined)
+            if (_event.code == fCore.KEYBOARD_CODE.E) {
+                let playerForward;
+                playerForward = fCore.Vector3.Z();
+                playerForward.transform(avatarNode.mtxWorld, false);
+                // tslint:disable-next-line: typedef
+                let distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
+                if (distance.magnitude > 2.5)
+                    return;
+                cmpRigidbodyBall.applyImpulseAtPoint(new fCore.Vector3(playerForward.x * kickStrength / distance.magnitude, playerForward.y * kickStrength / distance.magnitude, playerForward.z * kickStrength / distance.magnitude), avatarNode.mtxWorld.translation);
+            }
+        if (_event.code == fCore.KEYBOARD_CODE.T)
+            fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
+        if (_event.code == fCore.KEYBOARD_CODE.Y)
+            fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
     }
     function handler_Key_Released(_event) {
         if (_event.code == fCore.KEYBOARD_CODE.A)
@@ -101,12 +131,10 @@ var L05_PhysicsGame;
     function playerIsGroundedRaycast() {
         let hitInfo;
         hitInfo = fCore.Physics.raycast(cmpAvatar.getPosition(), new fCore.Vector3(0, -1, 0), 1.1);
-        if (hitInfo.hit) {
+        if (hitInfo.hit)
             isGrounded = true;
-        }
-        else {
+        else
             isGrounded = false;
-        }
     }
 })(L05_PhysicsGame || (L05_PhysicsGame = {}));
 //# sourceMappingURL=PhysicsGame.js.map
