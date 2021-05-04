@@ -226,7 +226,7 @@
               },
               {
                 "ƒ.GraphInstance": {
-                  "name": "board",
+                  "name": "playerBoard",
                   "components": {
                     "ComponentMesh": [
                       {

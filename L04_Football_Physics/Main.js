@@ -61,13 +61,14 @@ var Football_Physics;
                 let playerForward;
                 playerForward = f.Vector3.Z();
                 playerForward.transform(player.mtxWorld, false);
+                // tslint:disable-next-line: typedef
                 let distance = f.Vector3.DIFFERENCE(ball.mtxWorld.translation, player.mtxWorld.translation);
                 if (distance.magnitude > 2.5)
                     return;
                 ballBody.applyImpulseAtPoint(new f.Vector3(playerForward.x * kickStrength / distance.magnitude, playerForward.y * kickStrength / distance.magnitude, playerForward.z * kickStrength / distance.magnitude), player.mtxWorld.translation);
             }
         });
-        f.Physics.start(hierarchy);
+        f.Physics.adjustTransforms(hierarchy, true);
         f.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         f.Loop.start(); //Stard the game loop
     }
@@ -232,6 +233,7 @@ var Football_Physics;
         hierarchy.appendChild(environment[11]);
         environment[11].mtxLocal.translate(new f.Vector3(5, 2.5, -2));
         environment[11].mtxLocal.scale(new f.Vector3(3, 2, 0.2));
+        // tslint:disable-next-line: typedef
         let cylindricalJoint = new f.ComponentJointCylindrical(environment[10].getComponent(f.ComponentRigidbody), environment[11].getComponent(f.ComponentRigidbody), new f.Vector3(0, 1, 0));
         environment[11].addComponent(cylindricalJoint);
         cylindricalJoint.translationMotorLimitLower = -1;
