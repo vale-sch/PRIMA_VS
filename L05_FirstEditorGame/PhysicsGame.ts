@@ -13,10 +13,10 @@ namespace L05_PhysicsGame {
   let forwardMovement: number = 0;
   let movementspeed: number = 12;
   let turningspeed: number = 200;
-  let playerJumpForce: number = 1750;
+  let playerJumpForce: number = 2000;
   let isGrounded: boolean;
   let distance: fCore.Vector3;
-  let kickStrength: number = 400;
+  let kickStrength: number = 750;
   let isGrabbed: boolean;
   window.addEventListener("load", start);
 
@@ -122,13 +122,13 @@ namespace L05_PhysicsGame {
 
   function handler_Key_Pressed(_event: KeyboardEvent): void {
     if (_event.code == fCore.KEYBOARD_CODE.A)
-      yTurn = 0.66;
+      yTurn = 0.75;
     if (_event.code == fCore.KEYBOARD_CODE.W)
-      forwardMovement = 0.66;
+      forwardMovement = 1.33;
     if (_event.code == fCore.KEYBOARD_CODE.S)
-      forwardMovement = -0.66;
+      forwardMovement = -1.33;
     if (_event.code == fCore.KEYBOARD_CODE.D)
-      yTurn = -0.66;
+      yTurn = -0.75;
 
     if (_event.code == fCore.KEYBOARD_CODE.SPACE)
       if (isGrounded)
@@ -148,7 +148,7 @@ namespace L05_PhysicsGame {
         playerForward = fCore.Vector3.Z();
         playerForward.transform(avatarNode.mtxWorld, false);
         cmpRigidbodyBall.applyImpulseAtPoint(
-          new fCore.Vector3(playerForward.x * kickStrength, playerForward.y * kickStrength, playerForward.z * kickStrength),
+          new fCore.Vector3(playerForward.x * kickStrength, playerForward.y * 5 * kickStrength, playerForward.z * kickStrength),
           avatarNode.mtxWorld.translation);
       }
     }
