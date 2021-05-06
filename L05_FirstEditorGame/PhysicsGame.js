@@ -15,7 +15,7 @@ var L05_PhysicsGame;
     let forwardMovement = 0;
     let movementspeed = 12;
     let turningspeed = 200;
-    let playerJumpForce = 750;
+    let playerJumpForce = 1750;
     let isGrounded;
     let distance;
     let kickStrength = 400;
@@ -55,7 +55,7 @@ var L05_PhysicsGame;
         childAvatarNode = new fCore.Node("childAvatarNode");
         avatarNode.appendChild(childAvatarNode);
         childAvatarNode.addComponent(new fCore.ComponentTransform());
-        childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 1, 4));
+        childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 0.75, 5));
         root.appendChild(avatarNode);
     }
     function update() {

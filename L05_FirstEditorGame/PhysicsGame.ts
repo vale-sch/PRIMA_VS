@@ -13,7 +13,7 @@ namespace L05_PhysicsGame {
   let forwardMovement: number = 0;
   let movementspeed: number = 12;
   let turningspeed: number = 200;
-  let playerJumpForce: number = 750;
+  let playerJumpForce: number = 1750;
   let isGrounded: boolean;
   let distance: fCore.Vector3;
   let kickStrength: number = 400;
@@ -60,7 +60,7 @@ namespace L05_PhysicsGame {
     childAvatarNode = new fCore.Node("childAvatarNode");
     avatarNode.appendChild(childAvatarNode);
     childAvatarNode.addComponent(new fCore.ComponentTransform());
-    childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 1, 4));
+    childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 0.75, 5));
     root.appendChild(avatarNode);
   }
 
