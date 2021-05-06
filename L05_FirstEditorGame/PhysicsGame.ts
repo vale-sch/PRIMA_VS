@@ -8,15 +8,15 @@ namespace L05_PhysicsGame {
   let avatarNode: fCore.Node;
   let viewport: fCore.Viewport;
   let cmpCamera: fCore.ComponentCamera;
-
   let yTurn: number = 0;
   let forwardMovement: number = 0;
   let movementspeed: number = 12;
   let turningspeed: number = 200;
   let playerJumpForce: number = 750;
-  let kickStrength: number = 100;
   let isGrounded: boolean;
-
+  let distance: fCore.Vector3;
+  let kickStrength: number = 225;
+  let isGrabbed: boolean;
   window.addEventListener("load", start);
 
   async function start(_event: Event): Promise<void> {
@@ -66,14 +66,20 @@ namespace L05_PhysicsGame {
     if (ball.mtxWorld.translation.y < 0) {
       cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
       cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
-      cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 6, 0));
-      ball.mtxWorld.translate(new fCore.Vector3(0, 6, 0));
+      cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 4, 0));
+      ball.mtxWorld.translate(new fCore.Vector3(0, 4, 0));
     }
     if (avatarNode.mtxWorld.translation.y < 0) {
       cmpAvatar.setVelocity(new fCore.Vector3(0, 0, 0));
       cmpAvatar.setRotation(new fCore.Vector3(0, 0, 0));
-      cmpAvatar.setPosition(new fCore.Vector3(0, 6, 0));
-      avatarNode.mtxWorld.translate(new fCore.Vector3(0, 6, 0));
+      cmpAvatar.setPosition(new fCore.Vector3(0, 4, 0));
+      avatarNode.mtxWorld.translate(new fCore.Vector3(0, 4, 0));
+    }
+    if (isGrabbed) {
+      cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
+      cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+      cmpRigidbodyBall.setPosition(new fCore.Vector3(avatarNode.mtxLocal.translation.x, avatarNode.mtxLocal.translation.y + 1.33, avatarNode.mtxLocal.translation.z));
+      ball.mtxWorld.translate(new fCore.Vector3(avatarNode.mtxLocal.translation.x, avatarNode.mtxLocal.translation.y + 1.33, avatarNode.mtxLocal.translation.z));
     }
   }
 
@@ -118,20 +124,26 @@ namespace L05_PhysicsGame {
     if (_event.code == fCore.KEYBOARD_CODE.SPACE)
       if (isGrounded)
         cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
-    if (cmpRigidbodyBall != undefined)
+    if (cmpRigidbodyBall != undefined) {
       if (_event.code == fCore.KEYBOARD_CODE.E) {
+        distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
+        if (distance.magnitude > 2.5)
+          return;
+        cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
+        cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+        isGrabbed = true;
+      }
+      if (_event.code == fCore.KEYBOARD_CODE.R && isGrabbed == true) {
+        isGrabbed = false;
         let playerForward: fCore.Vector3;
         playerForward = fCore.Vector3.Z();
         playerForward.transform(avatarNode.mtxWorld, false);
-
-        // tslint:disable-next-line: typedef
-        let distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
-        if (distance.magnitude > 2.5)
-          return;
         cmpRigidbodyBall.applyImpulseAtPoint(
-          new fCore.Vector3(playerForward.x * kickStrength / distance.magnitude, playerForward.y * kickStrength / distance.magnitude, playerForward.z * kickStrength / distance.magnitude),
+          new fCore.Vector3(playerForward.x * kickStrength, playerForward.y * kickStrength, playerForward.z * kickStrength),
           avatarNode.mtxWorld.translation);
       }
+    }
+
 
     if (_event.code == fCore.KEYBOARD_CODE.T)
       fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
