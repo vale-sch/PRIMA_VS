@@ -36,6 +36,7 @@ var L05_PhysicsGame;
         let canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
         viewport.initialize("Viewport", root, cmpCamera, canvas);
+        document.addEventListener("keypress", grabObjects);
         document.addEventListener("keypress", handler_Key_Pressed);
         document.addEventListener("keyup", handler_Key_Released);
         //fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
@@ -120,6 +121,12 @@ var L05_PhysicsGame;
         if (_event.code == fCore.KEYBOARD_CODE.SPACE)
             if (isGrounded)
                 cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
+        if (_event.code == fCore.KEYBOARD_CODE.T)
+            fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
+        if (_event.code == fCore.KEYBOARD_CODE.Y)
+            fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
+    }
+    function grabObjects(_event) {
         if (cmpRigidbodyBall != undefined) {
             if (_event.code == fCore.KEYBOARD_CODE.E) {
                 distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
@@ -137,10 +144,6 @@ var L05_PhysicsGame;
                 cmpRigidbodyBall.applyImpulseAtPoint(new fCore.Vector3(playerForward.x * kickStrength, playerForward.y * 5 * kickStrength, playerForward.z * kickStrength), avatarNode.mtxWorld.translation);
             }
         }
-        if (_event.code == fCore.KEYBOARD_CODE.T)
-            fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
-        if (_event.code == fCore.KEYBOARD_CODE.Y)
-            fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
     }
     function handler_Key_Released(_event) {
         if (_event.code == fCore.KEYBOARD_CODE.A)
