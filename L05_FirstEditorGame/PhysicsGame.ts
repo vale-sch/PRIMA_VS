@@ -6,6 +6,7 @@ namespace L05_PhysicsGame {
   let cmpRigidbodyBall: fCore.ComponentRigidbody;
   let ball: fCore.Node;
   let avatarNode: fCore.Node;
+  let childAvatarNode: fCore.Node;
   let viewport: fCore.Viewport;
   let cmpCamera: fCore.ComponentCamera;
   let yTurn: number = 0;
@@ -15,7 +16,7 @@ namespace L05_PhysicsGame {
   let playerJumpForce: number = 750;
   let isGrounded: boolean;
   let distance: fCore.Vector3;
-  let kickStrength: number = 225;
+  let kickStrength: number = 400;
   let isGrabbed: boolean;
   window.addEventListener("load", start);
 
@@ -28,6 +29,9 @@ namespace L05_PhysicsGame {
     root = <fCore.Graph>FudgeCore.Project.resources["Graph|2021-04-27T14:37:42.239Z|64317"];
 
     cmpCamera = new fCore.ComponentCamera();
+    cmpCamera.clrBackground = fCore.Color.CSS("DEEPSKYBLUE");
+    cmpCamera.mtxPivot.translateY(1);
+    cmpCamera.mtxPivot.rotateX(10);
     createAvatar();
     createRigidbodies();
     let canvas: HTMLCanvasElement = document.querySelector("canvas");
@@ -48,10 +52,15 @@ namespace L05_PhysicsGame {
     cmpAvatar.restitution = 0.5;
     cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
     cmpAvatar.friction = 1;
-    avatarNode = new fCore.Node("Avatar");
+    avatarNode = new fCore.Node("AvatarNode");
     avatarNode.addComponent(new fCore.ComponentTransform(fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(3))));
     avatarNode.addComponent(cmpAvatar);
     avatarNode.addComponent(cmpCamera);
+
+    childAvatarNode = new fCore.Node("childAvatarNode");
+    avatarNode.appendChild(childAvatarNode);
+    childAvatarNode.addComponent(new fCore.ComponentTransform());
+    childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 1, 4));
     root.appendChild(avatarNode);
   }
 
@@ -78,8 +87,8 @@ namespace L05_PhysicsGame {
     if (isGrabbed) {
       cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
       cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
-      cmpRigidbodyBall.setPosition(new fCore.Vector3(avatarNode.mtxLocal.translation.x, avatarNode.mtxLocal.translation.y + 1.33, avatarNode.mtxLocal.translation.z));
-      ball.mtxWorld.translate(new fCore.Vector3(avatarNode.mtxLocal.translation.x, avatarNode.mtxLocal.translation.y + 1.33, avatarNode.mtxLocal.translation.z));
+      cmpRigidbodyBall.setPosition(childAvatarNode.mtxWorld.translation);
+      ball.mtxWorld.translate(childAvatarNode.mtxWorld.translation);
     }
   }
 
@@ -127,7 +136,7 @@ namespace L05_PhysicsGame {
     if (cmpRigidbodyBall != undefined) {
       if (_event.code == fCore.KEYBOARD_CODE.E) {
         distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
-        if (distance.magnitude > 2.5)
+        if (distance.magnitude > 4)
           return;
         cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
         cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
@@ -143,8 +152,6 @@ namespace L05_PhysicsGame {
           avatarNode.mtxWorld.translation);
       }
     }
-
-
     if (_event.code == fCore.KEYBOARD_CODE.T)
       fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
     if (_event.code == fCore.KEYBOARD_CODE.Y)
