@@ -74,20 +74,20 @@ namespace L05_PhysicsGame {
 
     if (ball == undefined) return;
     if (ball.mtxWorld.translation.y < 0) {
-      cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
-      cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+      cmpRigidbodyBall.setVelocity(fCore.Vector3.ZERO());
+      cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
       cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 4, 0));
       ball.mtxWorld.translate(new fCore.Vector3(0, 4, 0));
     }
     if (avatarNode.mtxWorld.translation.y < 0) {
-      cmpAvatar.setVelocity(new fCore.Vector3(0, 0, 0));
-      cmpAvatar.setRotation(new fCore.Vector3(0, 0, 0));
+      cmpAvatar.setVelocity(fCore.Vector3.ZERO());
+      cmpAvatar.setRotation(fCore.Vector3.ZERO());
       cmpAvatar.setPosition(new fCore.Vector3(0, 4, 0));
       avatarNode.mtxWorld.translate(new fCore.Vector3(0, 4, 0));
     }
     if (isGrabbed) {
-      cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
-      cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+      cmpRigidbodyBall.setVelocity(fCore.Vector3.ZERO());
+      cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
       cmpRigidbodyBall.setPosition(childAvatarNode.mtxWorld.translation);
       ball.mtxWorld.translate(childAvatarNode.mtxWorld.translation);
     }
@@ -146,8 +146,8 @@ namespace L05_PhysicsGame {
         distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
         if (distance.magnitude > 4)
           return;
-        cmpRigidbodyBall.setVelocity(new fCore.Vector3(0, 0, 0));
-        cmpRigidbodyBall.setRotation(new fCore.Vector3(0, 0, 0));
+        cmpRigidbodyBall.setVelocity(fCore.Vector3.ZERO());
+        cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
         isGrabbed = true;
       }
       if (_event.code == fCore.KEYBOARD_CODE.R && isGrabbed == true) {
