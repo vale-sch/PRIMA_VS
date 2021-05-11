@@ -14,13 +14,16 @@ var L05_PhysicsGame;
     let yTurn = 0;
     let forwardMovement = 0;
     let movementspeed = 12;
-    let turningspeed = 200;
+    let turningspeed = 5.5;
     let playerJumpForce = 2000;
     let isGrounded;
     let distance;
     let kickStrength = 750;
     let isGrabbed;
+    let mouseMove = new fCore.Vector2();
+    let isMouseMooving;
     window.addEventListener("load", start);
+    window.addEventListener("mousemove", onMouseMove);
     async function start(_event) {
         await FudgeCore.Project.loadResourcesFromHTML();
         // await FudgeCore.Project.loadResources("PhysicsGame.json");
@@ -84,6 +87,10 @@ var L05_PhysicsGame;
             cmpRigidbodyBall.setPosition(childAvatarNode.mtxWorld.translation);
             ball.mtxWorld.translate(childAvatarNode.mtxWorld.translation);
         }
+        if (!isMouseMooving) {
+            mouseMove = fCore.Vector2.ZERO();
+        }
+        isMouseMooving = false;
     }
     function createRigidbodies() {
         let level = root.getChildrenByName("level")[0];
@@ -102,12 +109,16 @@ var L05_PhysicsGame;
         playerForward.transform(avatarNode.mtxWorld, false);
         //You can rotate a body like you would rotate a transform, incremental but keep in mind, normally we use forces in physics,
         //this is just a feature to make it easier to create player characters
-        cmpAvatar.rotateBody(new fCore.Vector3(0, yTurn * turningspeed * _deltaTime, 0));
+        cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
         let movementVelocity = new fCore.Vector3();
         movementVelocity.x = playerForward.x * forwardMovement * movementspeed;
         movementVelocity.y = cmpAvatar.getVelocity().y;
         movementVelocity.z = playerForward.z * forwardMovement * movementspeed;
         cmpAvatar.setVelocity(movementVelocity);
+    }
+    function onMouseMove(_event) {
+        mouseMove = new fCore.Vector2(_event.movementX, _event.movementY);
+        isMouseMooving = true;
     }
     function handler_Key_Pressed(_event) {
         if (_event.code == fCore.KEYBOARD_CODE.A)

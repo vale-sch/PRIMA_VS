@@ -12,13 +12,16 @@ namespace L05_PhysicsGame {
   let yTurn: number = 0;
   let forwardMovement: number = 0;
   let movementspeed: number = 12;
-  let turningspeed: number = 200;
+  let turningspeed: number = 5.5;
   let playerJumpForce: number = 2000;
   let isGrounded: boolean;
   let distance: fCore.Vector3;
   let kickStrength: number = 750;
   let isGrabbed: boolean;
+  let mouseMove: fCore.Vector2 = new fCore.Vector2();
+  let isMouseMooving: boolean;
   window.addEventListener("load", start);
+  window.addEventListener("mousemove", onMouseMove);
 
   async function start(_event: Event): Promise<void> {
 
@@ -91,6 +94,11 @@ namespace L05_PhysicsGame {
       cmpRigidbodyBall.setPosition(childAvatarNode.mtxWorld.translation);
       ball.mtxWorld.translate(childAvatarNode.mtxWorld.translation);
     }
+    if (!isMouseMooving) {
+      mouseMove = fCore.Vector2.ZERO();
+    }
+
+    isMouseMooving = false;
   }
 
   function createRigidbodies(): void {
@@ -112,13 +120,16 @@ namespace L05_PhysicsGame {
 
     //You can rotate a body like you would rotate a transform, incremental but keep in mind, normally we use forces in physics,
     //this is just a feature to make it easier to create player characters
-    cmpAvatar.rotateBody(new fCore.Vector3(0, yTurn * turningspeed * _deltaTime, 0));
-
+    cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
     let movementVelocity: fCore.Vector3 = new fCore.Vector3();
     movementVelocity.x = playerForward.x * forwardMovement * movementspeed;
     movementVelocity.y = cmpAvatar.getVelocity().y;
     movementVelocity.z = playerForward.z * forwardMovement * movementspeed;
     cmpAvatar.setVelocity(movementVelocity);
+  }
+  function onMouseMove(_event: MouseEvent): void {
+    mouseMove = new fCore.Vector2(_event.movementX, _event.movementY);
+    isMouseMooving = true;
   }
 
   function handler_Key_Pressed(_event: KeyboardEvent): void {
