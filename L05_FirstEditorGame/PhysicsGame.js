@@ -11,7 +11,6 @@ var L05_PhysicsGame;
     let childAvatarNode;
     let viewport;
     let cmpCamera;
-    let yTurn = 0;
     let forwardMovement = 0;
     let movementspeed = 12;
     let turningspeed = 5.5;
@@ -121,14 +120,10 @@ var L05_PhysicsGame;
         isMouseMooving = true;
     }
     function handler_Key_Pressed(_event) {
-        if (_event.code == fCore.KEYBOARD_CODE.A)
-            yTurn = 0.75;
         if (_event.code == fCore.KEYBOARD_CODE.W)
             forwardMovement = 1.33;
         if (_event.code == fCore.KEYBOARD_CODE.S)
             forwardMovement = -1.33;
-        if (_event.code == fCore.KEYBOARD_CODE.D)
-            yTurn = -0.75;
         if (_event.code == fCore.KEYBOARD_CODE.SPACE)
             if (isGrounded)
                 cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
@@ -136,6 +131,12 @@ var L05_PhysicsGame;
             fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
         if (_event.code == fCore.KEYBOARD_CODE.Y)
             fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
+    }
+    function handler_Key_Released(_event) {
+        if (_event.code == fCore.KEYBOARD_CODE.W)
+            forwardMovement = 0;
+        if (_event.code == fCore.KEYBOARD_CODE.S)
+            forwardMovement = 0;
     }
     function grabObjects(_event) {
         if (cmpRigidbodyBall != undefined) {
@@ -155,16 +156,6 @@ var L05_PhysicsGame;
                 cmpRigidbodyBall.applyImpulseAtPoint(new fCore.Vector3(playerForward.x * kickStrength, playerForward.y * 5 * kickStrength, playerForward.z * kickStrength), avatarNode.mtxWorld.translation);
             }
         }
-    }
-    function handler_Key_Released(_event) {
-        if (_event.code == fCore.KEYBOARD_CODE.A)
-            yTurn = 0;
-        if (_event.code == fCore.KEYBOARD_CODE.W)
-            forwardMovement = 0;
-        if (_event.code == fCore.KEYBOARD_CODE.S)
-            forwardMovement = 0;
-        if (_event.code == fCore.KEYBOARD_CODE.D)
-            yTurn = 0;
     }
     function playerIsGroundedRaycast() {
         let hitInfo;

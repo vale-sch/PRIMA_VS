@@ -9,7 +9,6 @@ namespace L05_PhysicsGame {
   let childAvatarNode: fCore.Node;
   let viewport: fCore.Viewport;
   let cmpCamera: fCore.ComponentCamera;
-  let yTurn: number = 0;
   let forwardMovement: number = 0;
   let movementspeed: number = 12;
   let turningspeed: number = 5.5;
@@ -133,14 +132,10 @@ namespace L05_PhysicsGame {
   }
 
   function handler_Key_Pressed(_event: KeyboardEvent): void {
-    if (_event.code == fCore.KEYBOARD_CODE.A)
-      yTurn = 0.75;
     if (_event.code == fCore.KEYBOARD_CODE.W)
       forwardMovement = 1.33;
     if (_event.code == fCore.KEYBOARD_CODE.S)
       forwardMovement = -1.33;
-    if (_event.code == fCore.KEYBOARD_CODE.D)
-      yTurn = -0.75;
 
     if (_event.code == fCore.KEYBOARD_CODE.SPACE)
       if (isGrounded)
@@ -150,6 +145,12 @@ namespace L05_PhysicsGame {
       fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
     if (_event.code == fCore.KEYBOARD_CODE.Y)
       fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
+  }
+  function handler_Key_Released(_event: KeyboardEvent): void {
+    if (_event.code == fCore.KEYBOARD_CODE.W)
+      forwardMovement = 0;
+    if (_event.code == fCore.KEYBOARD_CODE.S)
+      forwardMovement = 0;
   }
   function grabObjects(_event: KeyboardEvent): void {
     if (cmpRigidbodyBall != undefined) {
@@ -172,16 +173,7 @@ namespace L05_PhysicsGame {
       }
     }
   }
-  function handler_Key_Released(_event: KeyboardEvent): void {
-    if (_event.code == fCore.KEYBOARD_CODE.A)
-      yTurn = 0;
-    if (_event.code == fCore.KEYBOARD_CODE.W)
-      forwardMovement = 0;
-    if (_event.code == fCore.KEYBOARD_CODE.S)
-      forwardMovement = 0;
-    if (_event.code == fCore.KEYBOARD_CODE.D)
-      yTurn = 0;
-  }
+
 
   function playerIsGroundedRaycast(): void {
     let hitInfo: fCore.RayHitInfo;
