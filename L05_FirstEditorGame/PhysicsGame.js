@@ -3,7 +3,10 @@ var L05_PhysicsGame;
 (function (L05_PhysicsGame) {
     var fCore = FudgeCore;
     // import fAid = FudgeAid;
-    let root;
+    let audioBackground = new fCore.Audio("./music/backgroundmusic.mp3");
+    let audioGrab = new fCore.Audio("./music/grab.wav");
+    let audioShoot = new fCore.Audio("./music/shoot.wav");
+    let rootGraph;
     let cmpAvatar;
     let cmpRigidbodyBall;
     let ball;
@@ -13,7 +16,7 @@ var L05_PhysicsGame;
     let cmpCamera;
     let forwardMovement = 0;
     let movementspeed = 12;
-    let turningspeed = 5.5;
+    let turningspeed = 12;
     let playerJumpForce = 2000;
     let isGrounded;
     let distance;
@@ -21,6 +24,8 @@ var L05_PhysicsGame;
     let isGrabbed;
     let mouseMove = new fCore.Vector2();
     let isMouseMooving;
+    let cmpAudioGrab = new fCore.ComponentAudio(audioGrab);
+    let cmpAudioShoot = new fCore.ComponentAudio(audioShoot);
     window.addEventListener("load", start);
     window.addEventListener("mousemove", onMouseMove);
     async function start(_event) {
@@ -28,7 +33,7 @@ var L05_PhysicsGame;
         // await FudgeCore.Project.loadResources("PhysicsGame.json");
         FudgeCore.Debug.log("Project:", FudgeCore.Project.resources);
         // pick the graph to show
-        root = FudgeCore.Project.resources["Graph|2021-04-27T14:37:42.239Z|64317"];
+        rootGraph = FudgeCore.Project.resources["Graph|2021-04-27T14:37:42.239Z|64317"];
         cmpCamera = new fCore.ComponentCamera();
         cmpCamera.clrBackground = fCore.Color.CSS("DEEPSKYBLUE");
         cmpCamera.mtxPivot.translateY(1);
@@ -37,12 +42,10 @@ var L05_PhysicsGame;
         createRigidbodies();
         let canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
-        viewport.initialize("Viewport", root, cmpCamera, canvas);
+        viewport.initialize("Viewport", rootGraph, cmpCamera, canvas);
         document.addEventListener("keypress", grabObjects);
         document.addEventListener("keypress", handler_Key_Pressed);
         document.addEventListener("keyup", handler_Key_Released);
-        //fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
-        //fCore.Loop.start();
         fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
     }
@@ -59,13 +62,30 @@ var L05_PhysicsGame;
         avatarNode.appendChild(childAvatarNode);
         childAvatarNode.addComponent(new fCore.ComponentTransform());
         childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 0.75, 5));
-        root.appendChild(avatarNode);
+        rootGraph.appendChild(avatarNode);
+        setupAudio();
+    }
+    function setupAudio() {
+        // setup audio
+        let cmpListener = new ƒ.ComponentAudioListener();
+        cmpCamera.getContainer().addComponent(cmpListener);
+        let audioNode = new fCore.Node("audioNode");
+        let cmpAudioBackground = new fCore.ComponentAudio(audioBackground, true, true);
+        cmpAudioBackground.volume = 0.2;
+        audioNode.addComponent(cmpAudioBackground);
+        audioNode.addComponent(cmpAudioGrab);
+        audioNode.addComponent(cmpAudioShoot);
+        avatarNode.appendChild(audioNode);
+        FudgeCore.AudioManager.default.listenWith(cmpListener);
+        FudgeCore.AudioManager.default.listenTo(audioNode);
+        console.log(FudgeCore.AudioManager.default.volume);
     }
     function update() {
         fCore.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);
         playerIsGroundedRaycast();
         player_Movement(fCore.Loop.timeFrameReal / 1000);
         viewport.draw();
+        fCore.AudioManager.default.update();
         if (ball == undefined)
             return;
         if (ball.mtxWorld.translation.y < 0) {
@@ -92,15 +112,15 @@ var L05_PhysicsGame;
         isMouseMooving = false;
     }
     function createRigidbodies() {
-        let level = root.getChildrenByName("level")[0];
+        let level = rootGraph.getChildrenByName("level")[0];
         for (let node of level.getChildren()) {
             let cmpRigidbody = new fCore.ComponentRigidbody(0, fCore.PHYSICS_TYPE.STATIC, fCore.COLLIDER_TYPE.CUBE, fCore.PHYSICS_GROUP.DEFAULT);
             node.addComponent(cmpRigidbody);
         }
-        ball = root.getChildrenByName("ball")[0];
+        ball = rootGraph.getChildrenByName("ball")[0];
         cmpRigidbodyBall = new fCore.ComponentRigidbody(25, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
         ball.addComponent(cmpRigidbodyBall);
-        fCore.Physics.adjustTransforms(root, true);
+        fCore.Physics.adjustTransforms(rootGraph, true);
     }
     function player_Movement(_deltaTime) {
         let playerForward;
@@ -144,11 +164,13 @@ var L05_PhysicsGame;
                 distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
                 if (distance.magnitude > 4)
                     return;
+                cmpAudioGrab.play(true);
                 cmpRigidbodyBall.setVelocity(fCore.Vector3.ZERO());
                 cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
                 isGrabbed = true;
             }
             if (_event.code == fCore.KEYBOARD_CODE.R && isGrabbed == true) {
+                cmpAudioShoot.play(true);
                 isGrabbed = false;
                 let playerForward;
                 playerForward = fCore.Vector3.Z();
