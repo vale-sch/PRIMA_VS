@@ -63,6 +63,7 @@ namespace L05_PhysicsGame {
     cmpAvatar.restitution = 0.5;
     cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
     cmpAvatar.friction = 1;
+
     avatarNode = new fCore.Node("AvatarNode");
     avatarNode.addComponent(new fCore.ComponentTransform(fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(3))));
     avatarNode.addComponent(cmpAvatar);
@@ -74,8 +75,6 @@ namespace L05_PhysicsGame {
 
     avatarNode.appendChild(childAvatarNode);
     rootGraph.appendChild(avatarNode);
-
-
   }
 
   function setupAudio(): void {
@@ -94,8 +93,6 @@ namespace L05_PhysicsGame {
 
     FudgeCore.AudioManager.default.listenWith(cmpListener);
     FudgeCore.AudioManager.default.listenTo(audioNode);
-
-    console.log(FudgeCore.AudioManager.default.volume);
   }
 
   function update(): void {
@@ -110,11 +107,9 @@ namespace L05_PhysicsGame {
     viewport.draw();
     fCore.AudioManager.default.update();
 
-
     if (!isMouseMooving)
       mouseMove = fCore.Vector2.ZERO();
     isMouseMooving = false;
-
 
     if (ball != undefined)
       if (ball.mtxWorld.translation.y < 0) {
