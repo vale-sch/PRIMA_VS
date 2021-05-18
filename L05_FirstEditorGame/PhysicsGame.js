@@ -19,7 +19,7 @@ var L05_PhysicsGame;
     let forwardMovement = 0;
     let backwardMovement = 0;
     let movementspeed = 12;
-    let turningspeed = 12;
+    let turningspeed = 8;
     let playerJumpForce = 2000;
     let kickStrength = 750;
     let distance;
@@ -40,6 +40,7 @@ var L05_PhysicsGame;
         cmpCamera.mtxPivot.translateY(1);
         cmpCamera.mtxPivot.rotateX(10);
         createAvatar();
+        setupAudio();
         createRigidbodies();
         let canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
@@ -61,7 +62,6 @@ var L05_PhysicsGame;
         childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 0.75, 5));
         avatarNode.appendChild(childAvatarNode);
         rootGraph.appendChild(avatarNode);
-        setupAudio();
     }
     function setupAudio() {
         // setup audio

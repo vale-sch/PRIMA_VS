@@ -20,7 +20,7 @@ namespace L05_PhysicsGame {
   let forwardMovement: number = 0;
   let backwardMovement: number = 0;
   let movementspeed: number = 12;
-  let turningspeed: number = 12;
+  let turningspeed: number = 8;
   let playerJumpForce: number = 2000;
   let kickStrength: number = 750;
 
@@ -47,6 +47,7 @@ namespace L05_PhysicsGame {
     cmpCamera.mtxPivot.translateY(1);
     cmpCamera.mtxPivot.rotateX(10);
     createAvatar();
+    setupAudio();
     createRigidbodies();
     let canvas: HTMLCanvasElement = document.querySelector("canvas");
     viewport = new fCore.Viewport();
@@ -74,7 +75,7 @@ namespace L05_PhysicsGame {
     avatarNode.appendChild(childAvatarNode);
     rootGraph.appendChild(avatarNode);
 
-    setupAudio();
+
   }
 
   function setupAudio(): void {
