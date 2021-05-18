@@ -94,7 +94,7 @@ namespace L05_PhysicsGame {
     avatarNode.appendChild(audioNode);
 
     FudgeCore.AudioManager.default.listenWith(cmpListener);
-    FudgeCore.AudioManager.default.listenTo(rootGraph);
+    FudgeCore.AudioManager.default.listenTo(audioNode);
   }
 
   function update(): void {
@@ -150,15 +150,13 @@ namespace L05_PhysicsGame {
   function handleKeys(_deltaTime: number): void {
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.W, fCore.KEYBOARD_CODE.ARROW_UP]))
       forwardMovement = 1.33;
-    else
-      if (forwardMovement >= 0)
-        forwardMovement -= _deltaTime * 2;
+    else if (forwardMovement >= 0)
+      forwardMovement -= _deltaTime * 2;
 
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.S, fCore.KEYBOARD_CODE.ARROW_DOWN]))
       backwardMovement = -1.33;
-    else
-      if (backwardMovement <= 0)
-        backwardMovement += _deltaTime * 2;
+    else if (backwardMovement <= 0)
+      backwardMovement += _deltaTime * 2;
 
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]))
       if (isGrounded)
