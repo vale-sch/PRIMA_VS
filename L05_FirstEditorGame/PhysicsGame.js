@@ -15,6 +15,7 @@ var L05_PhysicsGame;
     let viewport;
     let cmpCamera;
     let forwardMovement = 0;
+    let backwardMovement = 0;
     let movementspeed = 12;
     let turningspeed = 12;
     let playerJumpForce = 2000;
@@ -43,9 +44,6 @@ var L05_PhysicsGame;
         let canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
         viewport.initialize("Viewport", rootGraph, cmpCamera, canvas);
-        document.addEventListener("keypress", grabObjects);
-        document.addEventListener("keypress", handler_Key_Pressed);
-        document.addEventListener("keyup", handler_Key_Released);
         fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
     }
@@ -83,6 +81,8 @@ var L05_PhysicsGame;
     function update() {
         fCore.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);
         playerIsGroundedRaycast();
+        handleKeys(fCore.Loop.timeFrameReal / 1000);
+        isGrabbingObjects();
         player_Movement(fCore.Loop.timeFrameReal / 1000);
         viewport.draw();
         fCore.AudioManager.default.update();
@@ -106,9 +106,8 @@ var L05_PhysicsGame;
             cmpRigidbodyBall.setPosition(childAvatarNode.mtxWorld.translation);
             ball.mtxWorld.translate(childAvatarNode.mtxWorld.translation);
         }
-        if (!isMouseMooving) {
+        if (!isMouseMooving)
             mouseMove = fCore.Vector2.ZERO();
-        }
         isMouseMooving = false;
     }
     function createRigidbodies() {
@@ -122,45 +121,41 @@ var L05_PhysicsGame;
         ball.addComponent(cmpRigidbodyBall);
         fCore.Physics.adjustTransforms(rootGraph, true);
     }
+    function handleKeys(_deltaTime) {
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.W, fCore.KEYBOARD_CODE.ARROW_UP]))
+            forwardMovement = 1.33;
+        else if (forwardMovement >= 0)
+            forwardMovement -= _deltaTime * 2;
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.S, fCore.KEYBOARD_CODE.ARROW_DOWN]))
+            backwardMovement = -1.33;
+        else if (backwardMovement <= 0)
+            backwardMovement += _deltaTime * 2;
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]))
+            if (isGrounded)
+                cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.T]))
+            fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
+        if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.Y]))
+            fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
+    }
     function player_Movement(_deltaTime) {
         let playerForward;
         playerForward = fCore.Vector3.Z();
         playerForward.transform(avatarNode.mtxWorld, false);
-        //You can rotate a body like you would rotate a transform, incremental but keep in mind, normally we use forces in physics,
-        //this is just a feature to make it easier to create player characters
         cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
         let movementVelocity = new fCore.Vector3();
-        movementVelocity.x = playerForward.x * forwardMovement * movementspeed;
+        movementVelocity.x = playerForward.x * (forwardMovement + backwardMovement) * movementspeed;
         movementVelocity.y = cmpAvatar.getVelocity().y;
-        movementVelocity.z = playerForward.z * forwardMovement * movementspeed;
+        movementVelocity.z = playerForward.z * (forwardMovement + backwardMovement) * movementspeed;
         cmpAvatar.setVelocity(movementVelocity);
     }
     function onMouseMove(_event) {
         mouseMove = new fCore.Vector2(_event.movementX, _event.movementY);
         isMouseMooving = true;
     }
-    function handler_Key_Pressed(_event) {
-        if (_event.code == fCore.KEYBOARD_CODE.W)
-            forwardMovement = 1.33;
-        if (_event.code == fCore.KEYBOARD_CODE.S)
-            forwardMovement = -1.33;
-        if (_event.code == fCore.KEYBOARD_CODE.SPACE)
-            if (isGrounded)
-                cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
-        if (_event.code == fCore.KEYBOARD_CODE.T)
-            fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
-        if (_event.code == fCore.KEYBOARD_CODE.Y)
-            fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
-    }
-    function handler_Key_Released(_event) {
-        if (_event.code == fCore.KEYBOARD_CODE.W)
-            forwardMovement = 0;
-        if (_event.code == fCore.KEYBOARD_CODE.S)
-            forwardMovement = 0;
-    }
-    function grabObjects(_event) {
+    function isGrabbingObjects() {
         if (cmpRigidbodyBall != undefined) {
-            if (_event.code == fCore.KEYBOARD_CODE.E) {
+            if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.E])) {
                 distance = fCore.Vector3.DIFFERENCE(ball.mtxWorld.translation, avatarNode.mtxWorld.translation);
                 if (distance.magnitude > 4)
                     return;
@@ -169,7 +164,7 @@ var L05_PhysicsGame;
                 cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
                 isGrabbed = true;
             }
-            if (_event.code == fCore.KEYBOARD_CODE.R && isGrabbed == true) {
+            if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.R]) && isGrabbed == true) {
                 cmpAudioShoot.play(true);
                 isGrabbed = false;
                 let playerForward;
