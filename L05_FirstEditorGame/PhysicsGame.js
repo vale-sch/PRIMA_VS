@@ -81,19 +81,21 @@ var L05_PhysicsGame;
     function update() {
         fCore.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);
         playerIsGroundedRaycast();
-        handleKeys(fCore.Loop.timeFrameReal / 1000);
         isGrabbingObjects();
+        handleKeys(fCore.Loop.timeFrameReal / 1000);
         player_Movement(fCore.Loop.timeFrameReal / 1000);
         viewport.draw();
         fCore.AudioManager.default.update();
-        if (ball == undefined)
-            return;
-        if (ball.mtxWorld.translation.y < 0) {
-            cmpRigidbodyBall.setVelocity(fCore.Vector3.ZERO());
-            cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
-            cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 4, 0));
-            ball.mtxWorld.translate(new fCore.Vector3(0, 4, 0));
-        }
+        if (!isMouseMooving)
+            mouseMove = fCore.Vector2.ZERO();
+        isMouseMooving = false;
+        if (ball != undefined)
+            if (ball.mtxWorld.translation.y < 0) {
+                cmpRigidbodyBall.setVelocity(fCore.Vector3.ZERO());
+                cmpRigidbodyBall.setRotation(fCore.Vector3.ZERO());
+                cmpRigidbodyBall.setPosition(new fCore.Vector3(0, 4, 0));
+                ball.mtxWorld.translate(new fCore.Vector3(0, 4, 0));
+            }
         if (avatarNode.mtxWorld.translation.y < 0) {
             cmpAvatar.setVelocity(fCore.Vector3.ZERO());
             cmpAvatar.setRotation(fCore.Vector3.ZERO());
@@ -106,9 +108,6 @@ var L05_PhysicsGame;
             cmpRigidbodyBall.setPosition(childAvatarNode.mtxWorld.translation);
             ball.mtxWorld.translate(childAvatarNode.mtxWorld.translation);
         }
-        if (!isMouseMooving)
-            mouseMove = fCore.Vector2.ZERO();
-        isMouseMooving = false;
     }
     function createRigidbodies() {
         let level = rootGraph.getChildrenByName("level")[0];
