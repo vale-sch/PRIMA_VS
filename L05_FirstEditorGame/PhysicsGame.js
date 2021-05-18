@@ -57,9 +57,9 @@ var L05_PhysicsGame;
         avatarNode.addComponent(cmpAvatar);
         avatarNode.addComponent(cmpCamera);
         childAvatarNode = new fCore.Node("childAvatarNode");
-        avatarNode.appendChild(childAvatarNode);
         childAvatarNode.addComponent(new fCore.ComponentTransform());
         childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 0.75, 5));
+        avatarNode.appendChild(childAvatarNode);
         rootGraph.appendChild(avatarNode);
         setupAudio();
     }
@@ -141,11 +141,11 @@ var L05_PhysicsGame;
         let playerForward;
         playerForward = fCore.Vector3.Z();
         playerForward.transform(avatarNode.mtxWorld, false);
-        cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
         let movementVelocity = new fCore.Vector3();
         movementVelocity.x = playerForward.x * (forwardMovement + backwardMovement) * movementspeed;
         movementVelocity.y = cmpAvatar.getVelocity().y;
         movementVelocity.z = playerForward.z * (forwardMovement + backwardMovement) * movementspeed;
+        cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
         cmpAvatar.setVelocity(movementVelocity);
     }
     function onMouseMove(_event) {

@@ -31,7 +31,6 @@ namespace L05_PhysicsGame {
   let isGrabbed: boolean;
   let isMouseMooving: boolean;
 
-
   window.addEventListener("load", start);
   window.addEventListener("mousemove", onMouseMove);
 
@@ -58,6 +57,7 @@ namespace L05_PhysicsGame {
   }
 
   function createAvatar(): void {
+
     cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
     cmpAvatar.restitution = 0.5;
     cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
@@ -68,11 +68,12 @@ namespace L05_PhysicsGame {
     avatarNode.addComponent(cmpCamera);
 
     childAvatarNode = new fCore.Node("childAvatarNode");
-    avatarNode.appendChild(childAvatarNode);
-
     childAvatarNode.addComponent(new fCore.ComponentTransform());
     childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 0.75, 5));
+
+    avatarNode.appendChild(childAvatarNode);
     rootGraph.appendChild(avatarNode);
+
     setupAudio();
   }
 
@@ -176,11 +177,12 @@ namespace L05_PhysicsGame {
     playerForward = fCore.Vector3.Z();
     playerForward.transform(avatarNode.mtxWorld, false);
 
-    cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
     let movementVelocity: fCore.Vector3 = new fCore.Vector3();
     movementVelocity.x = playerForward.x * (forwardMovement + backwardMovement) * movementspeed;
     movementVelocity.y = cmpAvatar.getVelocity().y;
     movementVelocity.z = playerForward.z * (forwardMovement + backwardMovement) * movementspeed;
+
+    cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
     cmpAvatar.setVelocity(movementVelocity);
   }
   function onMouseMove(_event: MouseEvent): void {
