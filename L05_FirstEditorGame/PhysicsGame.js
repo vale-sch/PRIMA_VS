@@ -75,7 +75,7 @@ var L05_PhysicsGame;
         audioNode.addComponent(cmpAudioShoot);
         avatarNode.appendChild(audioNode);
         FudgeCore.AudioManager.default.listenWith(cmpListener);
-        FudgeCore.AudioManager.default.listenTo(audioNode);
+        FudgeCore.AudioManager.default.listenTo(rootGraph);
     }
     function update() {
         fCore.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);

@@ -46,9 +46,11 @@ namespace L05_PhysicsGame {
     cmpCamera.clrBackground = fCore.Color.CSS("DEEPSKYBLUE");
     cmpCamera.mtxPivot.translateY(1);
     cmpCamera.mtxPivot.rotateX(10);
+
     createAvatar();
     setupAudio();
     createRigidbodies();
+
     let canvas: HTMLCanvasElement = document.querySelector("canvas");
     viewport = new fCore.Viewport();
     viewport.initialize("Viewport", rootGraph, cmpCamera, canvas);
@@ -92,7 +94,7 @@ namespace L05_PhysicsGame {
     avatarNode.appendChild(audioNode);
 
     FudgeCore.AudioManager.default.listenWith(cmpListener);
-    FudgeCore.AudioManager.default.listenTo(audioNode);
+    FudgeCore.AudioManager.default.listenTo(rootGraph);
   }
 
   function update(): void {
@@ -181,6 +183,7 @@ namespace L05_PhysicsGame {
     cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
     cmpAvatar.setVelocity(movementVelocity);
   }
+
   function onMouseMove(_event: MouseEvent): void {
     mouseMove = new fCore.Vector2(_event.movementX, _event.movementY);
     isMouseMooving = true;
