@@ -4,27 +4,33 @@ namespace L05_PhysicsGame {
   let audioBackground: fCore.Audio = new fCore.Audio("./music/backgroundmusic.mp3");
   let audioGrab: fCore.Audio = new fCore.Audio("./music/grab.wav");
   let audioShoot: fCore.Audio = new fCore.Audio("./music/shoot.wav");
-  let rootGraph: fCore.Graph;
+
+  let cmpCamera: fCore.ComponentCamera;
   let cmpAvatar: fCore.ComponentRigidbody;
   let cmpRigidbodyBall: fCore.ComponentRigidbody;
+  let cmpAudioGrab: fCore.ComponentAudio = new fCore.ComponentAudio(audioGrab);
+  let cmpAudioShoot: fCore.ComponentAudio = new fCore.ComponentAudio(audioShoot);
+
   let ball: fCore.Node;
   let avatarNode: fCore.Node;
   let childAvatarNode: fCore.Node;
+  let rootGraph: fCore.Graph;
   let viewport: fCore.Viewport;
-  let cmpCamera: fCore.ComponentCamera;
+
   let forwardMovement: number = 0;
   let backwardMovement: number = 0;
   let movementspeed: number = 12;
   let turningspeed: number = 12;
   let playerJumpForce: number = 2000;
-  let isGrounded: boolean;
-  let distance: fCore.Vector3;
   let kickStrength: number = 750;
-  let isGrabbed: boolean;
+
+  let distance: fCore.Vector3;
   let mouseMove: fCore.Vector2 = new fCore.Vector2();
+
+  let isGrounded: boolean;
+  let isGrabbed: boolean;
   let isMouseMooving: boolean;
-  let cmpAudioGrab: fCore.ComponentAudio = new fCore.ComponentAudio(audioGrab);
-  let cmpAudioShoot: fCore.ComponentAudio = new fCore.ComponentAudio(audioShoot);
+
 
   window.addEventListener("load", start);
   window.addEventListener("mousemove", onMouseMove);
