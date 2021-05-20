@@ -45,6 +45,7 @@ var L05_PhysicsGame;
         canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
         viewport.initialize("Viewport", rootGraph, cmpCamera, canvas);
+        L05_PhysicsGame.Hud.start();
         fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
     }

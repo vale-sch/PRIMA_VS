@@ -11,13 +11,18 @@
     </script>
     <script type="text/javascript" src="../Aid/FudgeAid.js">
     </script>
+    <script type="text/javascript" src="../UserInterface/Build/FudgeUserInterface.js">
+    </script>
     <!--Link stylesheet and internal resources-->
     <link rel="stylesheet" href="PhysicsGame.css" />
     <link type="resources" src="PhysicsGame.json" />
 
     <script type="text/javascript" src="PhysicsGame.js"></script>
+    <script type="text/javascript" src="Hud.js"></script>
     <script type="text/javascript" src="ComponentScriptBall.js" editor="true"></script>
+
 </head>
+
 
 <body>
     <!--Dialog shown at startup only-->
@@ -31,7 +36,9 @@
     </canvas>
     <!---(Virtual)-UserInterface-->
     <div>
-        <input key="hits" value="Hallo" />
+        <meter key="hits" min=0 max=10 />
+        <input type=number key="hits" min=0 max=10 disabled />
+
     </div>
 </body>
 

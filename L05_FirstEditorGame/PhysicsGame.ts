@@ -53,6 +53,7 @@ namespace L05_PhysicsGame {
     canvas = document.querySelector("canvas");
     viewport = new fCore.Viewport();
     viewport.initialize("Viewport", rootGraph, cmpCamera, canvas);
+    Hud.start();
 
     fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
