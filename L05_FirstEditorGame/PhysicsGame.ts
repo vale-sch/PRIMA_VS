@@ -282,11 +282,13 @@ namespace L05_PhysicsGame {
     else
       isGrounded = false;
   }
+
   function onPointerDown(_event: MouseEvent): void {
     if (!isPointerInGame) {
       canvas.requestPointerLock();
     }
   }
+
   function pointerLockChange(_event: Event): void {
     if (!document.pointerLockElement) {
       isPointerInGame = false;
