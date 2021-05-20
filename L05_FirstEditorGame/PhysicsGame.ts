@@ -36,7 +36,6 @@ namespace L05_PhysicsGame {
   document.addEventListener("pointerlockchange", pointerLockChange);
 
   async function start(_event: Event): Promise<void> {
-
     await FudgeCore.Project.loadResourcesFromHTML();
     // await FudgeCore.Project.loadResources("PhysicsGame.json");
     FudgeCore.Debug.log("Project:", FudgeCore.Project.resources);
@@ -58,6 +57,7 @@ namespace L05_PhysicsGame {
     fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
   }
+
   export class BallBouncerCmp extends ƒ.ComponentScript {
     constructor() {
       super();
@@ -66,7 +66,6 @@ namespace L05_PhysicsGame {
       // ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.hndTimer);
       ƒ.Time.game.setTimer(50, 0, this.hndTimer);
     }
-
     public hndTimer = (_event: ƒ.EventTimer): void => {
       // console.log("Timer", this);
       let ballBdy: ƒ.ComponentRigidbody = this.getContainer().getComponent(ƒ.ComponentRigidbody);
@@ -85,12 +84,12 @@ namespace L05_PhysicsGame {
             break;
         }
     }
-
     public hndComponentAdd(_event: Event): void {
       console.log("ComponentAdd");
       // this.getContainer().addEventListener(ƒ.EVENT.RENDER_PREPARE_START, (_event: Event): void => console.log("Render"));
     }
   }
+
   export class StaticRotateCmp extends ƒ.ComponentScript {
     constructor() {
       super();
@@ -99,7 +98,6 @@ namespace L05_PhysicsGame {
       // ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.hndTimer);
       ƒ.Time.game.setTimer(1000, 0, this.hndTimer);
     }
-
     public hndTimer = (_event: ƒ.EventTimer): void => {
       // console.log("Timer", this);
       let staticBdy: ƒ.ComponentRigidbody = this.getContainer().getComponent(ƒ.ComponentRigidbody);
@@ -120,14 +118,13 @@ namespace L05_PhysicsGame {
           break;
       }
     }
-
     public hndComponentAdd(_event: Event): void {
       console.log("ComponentAdd");
       // this.getContainer().addEventListener(ƒ.EVENT.RENDER_PREPARE_START, (_event: Event): void => console.log("Render"));
     }
   }
-  function createAvatar(): void {
 
+  function createAvatar(): void {
     cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
     cmpAvatar.restitution = 0.5;
     cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
@@ -147,7 +144,6 @@ namespace L05_PhysicsGame {
   }
 
   function setupAudio(): void {
-    // setup audio
     let cmpListener: fCore.ComponentAudioListener = new fCore.ComponentAudioListener();
     cmpCamera.getContainer().addComponent(cmpListener);
 
@@ -175,7 +171,6 @@ namespace L05_PhysicsGame {
 
     viewport.draw();
     fCore.AudioManager.default.update();
-
 
     if (ball != undefined)
       if (ball.mtxWorld.translation.y < 0) {

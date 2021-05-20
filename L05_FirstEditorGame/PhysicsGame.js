@@ -130,7 +130,6 @@ var L05_PhysicsGame;
         rootGraph.appendChild(avatarNode);
     }
     function setupAudio() {
-        // setup audio
         let cmpListener = new fCore.ComponentAudioListener();
         cmpCamera.getContainer().addComponent(cmpListener);
         let audioNode = new fCore.Node("audioNode");
