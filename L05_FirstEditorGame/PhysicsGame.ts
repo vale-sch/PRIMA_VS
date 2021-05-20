@@ -1,9 +1,9 @@
 namespace L05_PhysicsGame {
   import fCore = FudgeCore;
   // import fAid = FudgeAid;
-  let audioBackground: fCore.Audio = new fCore.Audio("./music/backgroundmusic.mp3");
-  let audioGrab: fCore.Audio = new fCore.Audio("./music/grab.wav");
-  let audioShoot: fCore.Audio = new fCore.Audio("./music/shoot.wav");
+  let audioBackground: fCore.Audio = new fCore.Audio("./Audio/backgroundmusic.mp3");
+  let audioGrab: fCore.Audio = new fCore.Audio("./Audio/grab.wav");
+  let audioShoot: fCore.Audio = new fCore.Audio("./Audio/shoot.wav");
 
   let cmpCamera: fCore.ComponentCamera;
   let cmpAvatar: fCore.ComponentRigidbody;
@@ -19,20 +19,21 @@ namespace L05_PhysicsGame {
 
   let forwardMovement: number = 0;
   let backwardMovement: number = 0;
-  let movementspeed: number = 12;
-  let turningspeed: number = 8;
-  let playerJumpForce: number = 2000;
+  let movementspeed: number = 25;
+  let playerJumpForce: number = 450;
   let kickStrength: number = 750;
 
   let distance: fCore.Vector3;
-  let mouseMove: fCore.Vector2 = new fCore.Vector2();
 
   let isGrounded: boolean;
   let isGrabbed: boolean;
-  let isMouseMooving: boolean;
+  let isPointerInGame: boolean;
 
+  let canvas: HTMLCanvasElement;
   window.addEventListener("load", start);
   window.addEventListener("mousemove", onMouseMove);
+  document.addEventListener("mousedown", onPointerDown);
+  document.addEventListener("pointerlockchange", pointerLockChange);
 
   async function start(_event: Event): Promise<void> {
 
@@ -45,20 +46,86 @@ namespace L05_PhysicsGame {
     cmpCamera = new fCore.ComponentCamera();
     cmpCamera.clrBackground = fCore.Color.CSS("DEEPSKYBLUE");
     cmpCamera.mtxPivot.translateY(1);
-    cmpCamera.mtxPivot.rotateX(10);
 
     createAvatar();
     setupAudio();
     createRigidbodies();
 
-    let canvas: HTMLCanvasElement = document.querySelector("canvas");
+    canvas = document.querySelector("canvas");
     viewport = new fCore.Viewport();
     viewport.initialize("Viewport", rootGraph, cmpCamera, canvas);
 
     fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
   }
+  export class BallBouncerCmp extends ƒ.ComponentScript {
+    constructor() {
+      super();
+      console.log("BallBouncer created");
+      this.addEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndComponentAdd);
+      // ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.hndTimer);
+      ƒ.Time.game.setTimer(50, 0, this.hndTimer);
+    }
 
+    public hndTimer = (_event: ƒ.EventTimer): void => {
+      // console.log("Timer", this);
+      let ballBdy: ƒ.ComponentRigidbody = this.getContainer().getComponent(ƒ.ComponentRigidbody);
+      let randomNumber: Number = ƒ.Random.default.getRangeFloored(0, 3);
+      if (!isGrabbed)
+        switch (randomNumber) {
+          case 0:
+            ballBdy.applyLinearImpulse(fCore.Vector3.Y(ƒ.Random.default.getRangeFloored(5, 40)));
+            ballBdy.rotateBody(fCore.Vector3.X(ƒ.Random.default.getRangeFloored(-360, 360)));
+            break;
+          case 1:
+            ballBdy.applyLinearImpulse(fCore.Vector3.X(ƒ.Random.default.getRangeFloored(-15, 15)));
+            ballBdy.rotateBody(fCore.Vector3.Y(ƒ.Random.default.getRangeFloored(-360, 360)));
+            break;
+          case 2:
+            break;
+        }
+    }
+
+    public hndComponentAdd(_event: Event): void {
+      console.log("ComponentAdd");
+      // this.getContainer().addEventListener(ƒ.EVENT.RENDER_PREPARE_START, (_event: Event): void => console.log("Render"));
+    }
+  }
+  export class StaticRotateCmp extends ƒ.ComponentScript {
+    constructor() {
+      super();
+      console.log("StaticRotate created");
+      this.addEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndComponentAdd);
+      // ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.hndTimer);
+      ƒ.Time.game.setTimer(1000, 0, this.hndTimer);
+    }
+
+    public hndTimer = (_event: ƒ.EventTimer): void => {
+      // console.log("Timer", this);
+      let staticBdy: ƒ.ComponentRigidbody = this.getContainer().getComponent(ƒ.ComponentRigidbody);
+      switch (ƒ.Random.default.getRangeFloored(0, 5)) {
+        case 0:
+          staticBdy.rotateBody(fCore.Vector3.X(ƒ.Random.default.getRangeFloored(0, 180)));
+          break;
+        case 1:
+          staticBdy.rotateBody(fCore.Vector3.Y(ƒ.Random.default.getRangeFloored(-180, 180)));
+          break;
+        case 2:
+          staticBdy.rotateBody(fCore.Vector3.Z(ƒ.Random.default.getRangeFloored(-180, 180)));
+          break;
+        case 3:
+          staticBdy.rotateBody(fCore.Vector3.X(ƒ.Random.default.getRangeFloored(-180, 0)));
+          break;
+        case 4:
+          break;
+      }
+    }
+
+    public hndComponentAdd(_event: Event): void {
+      console.log("ComponentAdd");
+      // this.getContainer().addEventListener(ƒ.EVENT.RENDER_PREPARE_START, (_event: Event): void => console.log("Render"));
+    }
+  }
   function createAvatar(): void {
 
     cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
@@ -81,7 +148,7 @@ namespace L05_PhysicsGame {
 
   function setupAudio(): void {
     // setup audio
-    let cmpListener: fCore.ComponentAudioListener = new ƒ.ComponentAudioListener();
+    let cmpListener: fCore.ComponentAudioListener = new fCore.ComponentAudioListener();
     cmpCamera.getContainer().addComponent(cmpListener);
 
     let audioNode: fCore.Node = new fCore.Node("audioNode");
@@ -93,8 +160,8 @@ namespace L05_PhysicsGame {
     audioNode.addComponent(cmpAudioShoot);
     avatarNode.appendChild(audioNode);
 
-    FudgeCore.AudioManager.default.listenWith(cmpListener);
-    FudgeCore.AudioManager.default.listenTo(audioNode);
+    fCore.AudioManager.default.listenWith(cmpListener);
+    fCore.AudioManager.default.listenTo(rootGraph);
   }
 
   function update(): void {
@@ -109,9 +176,6 @@ namespace L05_PhysicsGame {
     viewport.draw();
     fCore.AudioManager.default.update();
 
-    if (!isMouseMooving)
-      mouseMove = fCore.Vector2.ZERO();
-    isMouseMooving = false;
 
     if (ball != undefined)
       if (ball.mtxWorld.translation.y < 0) {
@@ -137,13 +201,16 @@ namespace L05_PhysicsGame {
 
   function createRigidbodies(): void {
     let level: fCore.Node = rootGraph.getChildrenByName("level")[0];
-    for (let node of level.getChildren()) {
+    for (let staticThing of level.getChildren()) {
       let cmpRigidbody: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(0, fCore.PHYSICS_TYPE.STATIC, fCore.COLLIDER_TYPE.CUBE, fCore.PHYSICS_GROUP.DEFAULT);
-      node.addComponent(cmpRigidbody);
+      staticThing.addComponent(cmpRigidbody);
+      if (staticThing.name != "floor" && staticThing.name != "wall")
+        staticThing.addComponent(new StaticRotateCmp());
     }
     ball = rootGraph.getChildrenByName("ball")[0];
     cmpRigidbodyBall = new fCore.ComponentRigidbody(25, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
     ball.addComponent(cmpRigidbodyBall);
+    ball.addComponent(new BallBouncerCmp());
     fCore.Physics.adjustTransforms(rootGraph, true);
   }
 
@@ -160,7 +227,7 @@ namespace L05_PhysicsGame {
 
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.SPACE]))
       if (isGrounded)
-        cmpAvatar.applyLinearImpulse(new fCore.Vector3(0, playerJumpForce, 0));
+        cmpAvatar.applyLinearImpulse(fCore.Vector3.Y(playerJumpForce));
 
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.T]))
       fCore.Physics.settings.debugMode = fCore.Physics.settings.debugMode == fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER ? fCore.PHYSICS_DEBUGMODE.PHYSIC_OBJECTS_ONLY : fCore.PHYSICS_DEBUGMODE.JOINTS_AND_COLLIDER;
@@ -177,14 +244,15 @@ namespace L05_PhysicsGame {
     movementVelocity.x = playerForward.x * (forwardMovement + backwardMovement) * movementspeed;
     movementVelocity.y = cmpAvatar.getVelocity().y;
     movementVelocity.z = playerForward.z * (forwardMovement + backwardMovement) * movementspeed;
-
-    cmpAvatar.rotateBody(new fCore.Vector3(0, -mouseMove.x * turningspeed * _deltaTime, 0));
     cmpAvatar.setVelocity(movementVelocity);
   }
 
   function onMouseMove(_event: MouseEvent): void {
-    mouseMove = new fCore.Vector2(_event.movementX, _event.movementY);
-    isMouseMooving = true;
+    if (isPointerInGame) {
+      avatarNode.mtxLocal.rotateY(-_event.movementX / 2);
+      cmpAvatar.rotateBody(fCore.Vector3.Y(-_event.movementX / 2));
+      avatarNode.getComponent(fCore.ComponentCamera).mtxPivot.rotateX(_event.movementY / 5);
+    }
   }
 
   function isGrabbingObjects(): void {
@@ -218,5 +286,17 @@ namespace L05_PhysicsGame {
       isGrounded = true;
     else
       isGrounded = false;
+  }
+  function onPointerDown(_event: MouseEvent): void {
+    if (!isPointerInGame) {
+      canvas.requestPointerLock();
+    }
+  }
+  function pointerLockChange(_event: Event): void {
+    if (!document.pointerLockElement) {
+      isPointerInGame = false;
+    } else {
+      isPointerInGame = true;
+    }
   }
 }
