@@ -3,28 +3,36 @@
 
 <head>
 
-<title>BasketBall_BattleRoyale</title>
+    <title>BasketBall_BattleRoyale</title>
 
-<meta charset="utf-8" />
-<!--Load FUDGE-->
-<script type="text/javascript" src="../FudgePhysics/OimoPhysics.js">
-</script>
-<script type="text/javascript" src="../FudgeCore/FudgeCore.js">
-</script>
-<script type="text/javascript" src="../Aid/FudgeAid.js">
-</script>
-
-<script type="text/javascript" src="./Scripts/Main.js">
-</script>
-<!--Link stylesheet and internal resources-->
-<link rel="stylesheet" href="BasketBall_BattleRoyale.css" />
-<link type="resources" src="BasketBall_BattleRoyale.json" />
+    <meta charset="utf-8" />
+    <!--Load FUDGE-->
+    <script type="text/javascript" src="../FudgePhysics/OimoPhysics.js">
+    </script>
+    <script type="text/javascript" src="../FudgeCore/FudgeCore.js">
+    </script>
+    <script type="text/javascript" src="../Aid/FudgeAid.js">
+    </script>
+    <script type="text/javascript" src="../UserInterface/Build/FudgeUserInterface.js">
+    </script>
+    <script type="text/javascript" src="./Scripts/Main.js">
+    </script>
+    <script type="text/javascript" src="./Scripts/Hud.js">
+    </script>
+    <!--Link stylesheet and internal resources-->
+    <link rel="stylesheet" href="BasketBall_BattleRoyale.css" />
+    <link type="resources" src="BasketBall_BattleRoyale.json" />
 </head>
 
 <body>
-<canvas class="fullscreen">
+    <canvas class="fullscreen">
 
-</canvas>
+    </canvas>
+    <div>
+
+        <input type=string key="hits" min=0 max=10 disabled />
+
+    </div>
 </body>
 
 </html>
