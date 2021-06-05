@@ -127,6 +127,36 @@
       }
     }
   },
+  "MeshCube|2021-06-04T17:09:28.819Z|53130": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2021-06-04T17:09:28.819Z|53130",
+      "name": "EnemyBody2",
+      "type": "MeshCube"
+    }
+  },
+  "MeshSphere|2021-06-04T11:57:28.782Z|30271": {
+    "ƒ.MeshSphere": {
+      "idResource": "MeshSphere|2021-06-04T11:57:28.782Z|30271",
+      "name": "enemyHead",
+      "type": "MeshSphere",
+      "sectors": 8,
+      "stacks": 8
+    }
+  },
+  "MeshTorus|2021-06-04T11:56:59.868Z|83990": {
+    "ƒ.MeshTorus": {
+      "idResource": "MeshTorus|2021-06-04T11:56:59.868Z|83990",
+      "name": "enemyNeck",
+      "type": "MeshTorus"
+    }
+  },
+  "MeshCube|2021-06-04T11:57:55.541Z|09489": {
+    "ƒ.MeshCube": {
+      "idResource": "MeshCube|2021-06-04T11:57:55.541Z|09489",
+      "name": "EnemyExtremities",
+      "type": "MeshCube"
+    }
+  },
   "Graph|2021-06-02T10:15:15.171Z|84209": {
     "ƒ.Graph": {
       "name": "BasketBallBattleRoyale",
@@ -960,9 +990,7 @@
                                       }
                                     }
                                   }
-                                ],
-                                "ComponentMesh": [],
-                                "ComponentMaterial": []
+                                ]
                               },
                               "children": []
                             }
@@ -3449,6 +3477,13 @@
                                 }
                               }
                             }
+                          ],
+                          "BasketBallsController": [
+                            {
+                              "basketBallBattleRoyale.BasketBallsController": {
+                                "active": true
+                              }
+                            }
                           ]
                         },
                         "children": []
@@ -3607,41 +3642,11 @@
       }
     }
   },
-  "MeshTorus|2021-06-04T11:56:59.868Z|83990": {
-    "ƒ.MeshTorus": {
-      "idResource": "MeshTorus|2021-06-04T11:56:59.868Z|83990",
-      "name": "enemyNeck",
-      "type": "MeshTorus"
-    }
-  },
-  "MeshSphere|2021-06-04T11:57:28.782Z|30271": {
-    "ƒ.MeshSphere": {
-      "idResource": "MeshSphere|2021-06-04T11:57:28.782Z|30271",
-      "name": "enemyHead",
-      "type": "MeshSphere",
-      "sectors": 8,
-      "stacks": 8
-    }
-  },
   "MeshPyramid|2021-06-04T11:57:45.390Z|24263": {
     "ƒ.MeshPyramid": {
       "idResource": "MeshPyramid|2021-06-04T11:57:45.390Z|24263",
       "name": "EnemyBody",
       "type": "MeshPyramid"
-    }
-  },
-  "MeshCube|2021-06-04T11:57:55.541Z|09489": {
-    "ƒ.MeshCube": {
-      "idResource": "MeshCube|2021-06-04T11:57:55.541Z|09489",
-      "name": "EnemyExtremities",
-      "type": "MeshCube"
-    }
-  },
-  "MeshCube|2021-06-04T17:09:28.819Z|53130": {
-    "ƒ.MeshCube": {
-      "idResource": "MeshCube|2021-06-04T17:09:28.819Z|53130",
-      "name": "EnemyBody2",
-      "type": "MeshCube"
     }
   }
 }

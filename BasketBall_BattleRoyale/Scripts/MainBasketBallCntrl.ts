@@ -29,6 +29,7 @@ namespace basketBallBattleRoyale {
   let movementspeed: number = 4;
   let frictionFactor: number = 6;
 
+
   let throwStrength: number = 375;
   let hitCounter: number = 1;
   let targetPlayersName: string;
@@ -48,7 +49,7 @@ namespace basketBallBattleRoyale {
       fCore.Project.resources["Graph|2021-06-02T10:15:15.171Z|84209"]
     );
     cmpCamera = new fCore.ComponentCamera();
-    cmpCamera.clrBackground = fCore.Color.CSS("GREY");
+    cmpCamera.clrBackground = fCore.Color.CSS("SKYBLUE");
     cmpCamera.mtxPivot.translateY(2);
 
     canvas = document.querySelector("canvas");
@@ -81,18 +82,24 @@ namespace basketBallBattleRoyale {
     Hud.start();
     fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
     fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
+
     console.log(bskBallRoot);
   }
 
 
+
+
+
+
   function update(): void {
     //functions with delta time
-    ƒ.Physics.world.simulate(ƒ.Loop.timeFrameReal / 1000);
+    ƒ.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);
     player_Movement(fCore.Loop.timeFrameReal / 1000);
-    enemy_Movement(fCore.Loop.timeFrameReal / 1000);
-    isGrabbingObjects();
+
     handleKeys(fCore.Loop.timeFrameReal / 1000);
 
+    //player Grab function
+    isGrabbingObjects();
     //debug keyboard events
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.T]))
       fCore.Physics.settings.debugMode =
@@ -105,13 +112,13 @@ namespace basketBallBattleRoyale {
     //------
 
     //playerGrab--------------------
-    if (basketBalls != undefined)
-      if (basketBalls[0].mtxWorld.translation.y < 0) {
-        basketBalls[0].getComponent(fCore.ComponentRigidbody).setVelocity(fCore.Vector3.ZERO());
-        basketBalls[0].getComponent(fCore.ComponentRigidbody).setRotation(fCore.Vector3.ZERO());
-        basketBalls[0].getComponent(fCore.ComponentRigidbody).setPosition(new fCore.Vector3(0, 4, 0));
-        basketBalls[0].mtxWorld.translate(new fCore.Vector3(0, 4, 0));
-      }
+    // if (basketBalls != undefined)
+    //   if (basketBalls[0].mtxWorld.translation.y < 0) {
+    //     basketBalls[0].getComponent(fCore.ComponentRigidbody).setVelocity(fCore.Vector3.ZERO());
+    //     basketBalls[0].getComponent(fCore.ComponentRigidbody).setRotation(fCore.Vector3.ZERO());
+    //     basketBalls[0].getComponent(fCore.ComponentRigidbody).setPosition(new fCore.Vector3(0, 4, 0));
+    //     basketBalls[0].mtxWorld.translate(new fCore.Vector3(0, 4, 0));
+    //   }
     if (avatarNode.mtxWorld.translation.y < 0) {
       cmpAvatar.setVelocity(fCore.Vector3.ZERO());
       cmpAvatar.setRotation(fCore.Vector3.ZERO());
@@ -121,6 +128,7 @@ namespace basketBallBattleRoyale {
 
     if (isGrabbed) {
       targetPlayersName = targetChooserPlayer();
+      basketBalls[0].getComponent(BasketBallsController).isInUse = true;
       basketBalls[0].getComponent(fCore.ComponentRigidbody).setVelocity(fCore.Vector3.ZERO());
       basketBalls[0].getComponent(fCore.ComponentRigidbody).setRotation(fCore.Vector3.ZERO());
       basketBalls[0].getComponent(fCore.ComponentRigidbody).setPosition(childAvatarNode.mtxWorld.translation);
@@ -131,13 +139,6 @@ namespace basketBallBattleRoyale {
     viewport.draw();
   }
 
-  function enemy_Movement(_deltaTime: number): void {
-    rgdBdyEnemies.forEach(rgdBdyEnemy => {
-
-      if (fCore.Vector3.DIFFERENCE(basketBalls[0].mtxWorld.translation, rgdBdyEnemy.getContainer().mtxWorld.translation).magnitude > 2)
-        rgdBdyEnemy.applyLinearImpulse(new fCore.Vector3(basketBalls[0].mtxWorld.translation.x * 500, 0, basketBalls[0].mtxWorld.translation.z * 500));
-    });
-  }
 
   function createRigidbodies(): void {
     //floorTiles
@@ -160,6 +161,9 @@ namespace basketBallBattleRoyale {
     );
     for (let basketBall of basketBalls)
       basketBall.addComponent(dynamicRgdbdy);
+
+
+
 
     //Basket, Stand and other Colliders of Players 
     let counterStand: number = 0;
@@ -199,17 +203,21 @@ namespace basketBallBattleRoyale {
     let counterRgdBdy: number = 0;
     for (let player of playersContainer.getChildren()) {
       if (player.name != "AvatarsContainer") {
+
         let body: fCore.Node = player.getChild(1);
         let dynamicEnemyRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-          25,
+          75,
           fCore.PHYSICS_TYPE.DYNAMIC,
-          fCore.COLLIDER_TYPE.CUBE,
-          fCore.PHYSICS_GROUP.GROUP_2
+          fCore.COLLIDER_TYPE.CAPSULE,
+          fCore.PHYSICS_GROUP.DEFAULT
         );
         dynamicEnemyRgdbdy.restitution = 0.1;
         dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
         dynamicEnemyRgdbdy.friction = 100;
         body.addComponent(dynamicEnemyRgdbdy);
+
+        // tslint:disable-next-line: no-unused-expression
+        player.addComponent(new EnemyController(player.getChild(1), player.getChild(0), dynamicEnemyRgdbdy, 10, basketBalls, collMeshesOfBasketTrigger));
         rgdBdyEnemies[counterRgdBdy] = dynamicEnemyRgdbdy;
         counterRgdBdy++;
       }
@@ -262,11 +270,13 @@ namespace basketBallBattleRoyale {
   }
 
   function isGrabbingObjects(): void {
+    let throwThreshold: number = 6;
+
     if (basketBalls != undefined) {
       if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.E])) {
-
+        if (basketBalls[0].getComponent(BasketBallsController).isInUse) return;
         let distance: fCore.Vector3 = fCore.Vector3.DIFFERENCE(basketBalls[0].mtxWorld.translation, avatarNode.mtxWorld.translation);
-        if (distance.magnitude > 6)
+        if (distance.magnitude > throwThreshold)
           return;
         basketBalls[0].getComponent(fCore.ComponentRigidbody).setVelocity(fCore.Vector3.ZERO());
         basketBalls[0].getComponent(fCore.ComponentRigidbody).setRotation(fCore.Vector3.ZERO());
@@ -275,6 +285,7 @@ namespace basketBallBattleRoyale {
       }
       //which target was chosen from raycast-info
       if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.R]) && isGrabbed == true) {
+
         playersContainer.getChildren().forEach(player => {
           if (player.getChild(0).name == targetPlayersName)
             collMeshesOfBasketTrigger.forEach(trigger => {
@@ -286,9 +297,9 @@ namespace basketBallBattleRoyale {
         //check distance to basket
         let distance: fCore.Vector3 = fCore.Vector3.DIFFERENCE(basketBalls[0].mtxWorld.translation, actualTarget.mtxWorld.translation);
         let distanceMag: number = distance.magnitude;
-        if (distanceMag < 6) return;
+        if (distanceMag < throwThreshold) return;
         isGrabbed = false;
-
+        basketBalls[0].getComponent(BasketBallsController).isInUse = false;
         let playerForward: fCore.Vector3;
         playerForward = fCore.Vector3.Z();
         playerForward.transform(avatarNode.mtxWorld, false);
@@ -339,9 +350,8 @@ namespace basketBallBattleRoyale {
 
   }
 
-  function hndTrigger(_event: ƒ.EventPhysics): void {
-    if (collMeshesOfBasketTrigger[0].mtxWorld.translation.y < _event.cmpRigidbody.getContainer().getComponent(fCore.ComponentMesh).mtxWorld.translation.y)
-      gameState.hits = "Hits: " + hitCounter++;
+  export function hndTrigger(_event: ƒ.EventPhysics): void {
+    gameState.hits = "Hits: " + hitCounter++;
   }
 
   function handleKeys(_deltaTime: number): void {
@@ -380,7 +390,7 @@ namespace basketBallBattleRoyale {
   function onMouseMove(_event: MouseEvent): void {
     if (isPointerInGame) {
       //roatation for y axis on rgdbdy and mesh
-      let rotFriction: number = 5;
+      let rotFriction: number = 10;
       avatarNode.mtxLocal.rotateY(-_event.movementX / rotFriction);
       cmpAvatar.rotateBody(fCore.Vector3.Y(-_event.movementX / rotFriction));
       //rotation for x axis on cmpCamera

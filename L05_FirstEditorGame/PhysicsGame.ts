@@ -95,7 +95,7 @@ namespace L05_PhysicsGame {
     constructor() {
       super();
       console.log("StaticRotate created");
-      this.addEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndComponentAdd);
+      //this.addEventListener(ƒ.EVENT.COMPONENT_ADD, this.hndComponentAdd);
       // ƒ.Loop.addEventListener(ƒ.EVENT.LOOP_FRAME, this.hndTimer);
       ƒ.Time.game.setTimer(1000, 0, this.hndTimer);
     }
