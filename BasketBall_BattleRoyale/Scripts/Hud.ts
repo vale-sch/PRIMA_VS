@@ -2,8 +2,13 @@ namespace basketBallBattleRoyale {
     import fudgeUI = FudgeUserInterface;
 
     export class GameState extends FudgeCore.Mutable {
-        public hits: string = "";
-        protected reduceMutator(_mutator: FudgeCore.Mutator): void { }
+        public hitsAvatar: string = "";
+        public hitsEnemyBlue: string = "";
+        public hitsEnemyRed: string = "";
+        public hitsEnemyMagenta: string = "";
+        // tslint:disable-next-line: no-empty
+        protected reduceMutator(_mutator: FudgeCore.Mutator): void {
+        }
     }
     export let gameState: GameState = new GameState();
 

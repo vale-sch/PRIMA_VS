@@ -3,21 +3,26 @@ namespace basketBallBattleRoyale {
 
 
     fCore.Project.registerScriptNamespace(basketBallBattleRoyale);
-    export class EnemyController extends fCore.ComponentScript {
-        public score: number;
+    export class EnemiesController extends fCore.ComponentScript {
 
-        public basketBalls: fCore.Node[];
-        public containerEnemy: fCore.Node;
-        public containerMesh: fCore.Node;
-        public containerTriggers: fCore.ComponentMesh[];
-        public rgdBdyEnemy: fCore.ComponentRigidbody;
-        public enemyContainer: fCore.Node;
-        public childAvatarNode: fCore.Node;
-        public waitTime: number = 2;
-        public movementSpeed: number = 1.25;
-        public hasGrabbed: boolean;
-        public throwStrength: number = 10;
-        constructor(_containerEnemy: fCore.Node, _containerMesh: fCore.Node, _rgdBdyEnemy: fCore.ComponentRigidbody, _score: number, _basketBalls: fCore.Node[], _containerTrigger: fCore.ComponentMesh[]) {
+        public score: number;
+        public myBsktTrigger: fCore.ComponentMesh;
+
+        private basketBalls: fCore.Node[];
+        private containerEnemy: fCore.Node;
+        private containerMesh: fCore.Node;
+        private enemyContainer: fCore.Node;
+        private childAvatarNode: fCore.Node;
+        private throwStrength: number = 12;
+        private containerTriggers: fCore.ComponentMesh[];
+        private rgdBdyEnemy: fCore.ComponentRigidbody;
+
+        private waitTime: number = 2;
+        private movementSpeed: number = 1.25;
+
+        private rndChosenTarget: fCore.ComponentMesh;
+        private hasGrabbed: boolean;
+        constructor(_containerEnemy: fCore.Node, _containerMesh: fCore.Node, _rgdBdyEnemy: fCore.ComponentRigidbody, _score: number, _basketBalls: fCore.Node[], _containerTriggers: fCore.ComponentMesh[]) {
             super();
             this.containerEnemy = _containerEnemy;
             this.containerMesh = _containerMesh;
@@ -25,21 +30,29 @@ namespace basketBallBattleRoyale {
             this.enemyContainer = _rgdBdyEnemy.getContainer();
             this.score = _score;
             this.basketBalls = _basketBalls;
-            this.containerTriggers = _containerTrigger;
+            this.containerTriggers = _containerTriggers;
 
             this.childAvatarNode = new fCore.Node("childAvatarNode");
             this.childAvatarNode.addComponent(new fCore.ComponentTransform());
             this.childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 3, 0));
 
             this.containerEnemy.appendChild(this.childAvatarNode);
-
-
+            this.whoAmI();
             fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, this.update);
             fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
         }
+        private whoAmI = (): void => {
+            this.containerTriggers.forEach(trigger => {
+                if (trigger.getContainer().getParent().getParent().getChild(1).name != "Avatar")
+                    if (this.containerEnemy.name == trigger.getContainer().getParent().getParent().getChild(1).name) {
+                        this.myBsktTrigger = trigger;
+                    }
+            });
 
-        public update = (): void => {
-            this.moveToAvailableBalls();
+        }
+
+        private update = (): void => {
+            // this.moveToAvailableBalls();
             if (!this.hasGrabbed) return;
             if (this.basketBalls[0].getComponent(BasketBallsController).isInUse) {
                 if (!this.basketBalls[0].getComponent(BasketBallsController).isInFlight) {
@@ -50,48 +63,45 @@ namespace basketBallBattleRoyale {
                     this.rgdBdyEnemy.setVelocity(fCore.Vector3.ZERO());
 
                     this.waitTime = this.waitTime - fCore.Loop.timeFrameReal / 1000;
-                    if (this.waitTime <= 0) {
+                    if (this.waitTime <= 0)
                         this.basketBalls[0].getComponent(BasketBallsController).isInFlight = true;
-                    }
-                    //diffrent powers for diffrent distances
+
                 }
                 if (this.basketBalls[0].getComponent(BasketBallsController).isInFlight) {
-                    let randomTarget: number = new fCore.Random().getRangeFloored(0, 4);
+                    let randomTargetNmb: number = new fCore.Random().getRangeFloored(0, 4);
+                    this.rndChosenTarget = this.containerTriggers[randomTargetNmb];
+                    if (this.myBsktTrigger == this.rndChosenTarget) return;
                     this.waitTime = 2;
-                    let distance: fCore.Vector3 = fCore.Vector3.DIFFERENCE(this.basketBalls[0].mtxWorld.translation, this.containerTriggers[randomTarget].mtxWorld.translation);
+
+                    let distance: fCore.Vector3 = fCore.Vector3.DIFFERENCE(this.basketBalls[0].mtxWorld.translation, this.rndChosenTarget.mtxWorld.translation);
                     let distanceMag: number = distance.magnitude;
-                    let playerForward: fCore.Vector3 = new fCore.Vector3(this.containerTriggers[randomTarget].mtxWorld.translation.x - this.enemyContainer.mtxWorld.translation.x, 0, this.containerTriggers[randomTarget].mtxWorld.translation.z - this.enemyContainer.mtxWorld.translation.z);
 
-                    playerForward.transform(this.containerTriggers[randomTarget].mtxWorld, false);
+                    let playerForward: fCore.Vector3 = new fCore.Vector3(this.rndChosenTarget.mtxWorld.translation.x - this.enemyContainer.mtxWorld.translation.x, 0, this.rndChosenTarget.mtxWorld.translation.z - this.enemyContainer.mtxWorld.translation.z);
 
-                    this.containerTriggers[randomTarget].getContainer().getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTrigger);
-                    console.log(this.containerTriggers[randomTarget].getContainer().getParent().name);
+                    playerForward.transform(this.rndChosenTarget.mtxWorld, false);
 
-                    this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
-                        new fCore.Vector3(playerForward.x * 8, distanceMag * 2, playerForward.z * 8),
-                        this.enemyContainer.mtxWorld.translation);
 
-                    if (distanceMag > 16.5)
+                    console.log(distanceMag);
+                    if (distanceMag > 25)
                         this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
-                            new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 3, playerForward.z * this.throwStrength),
+                            new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 7, playerForward.z * this.throwStrength),
                             this.enemyContainer.mtxWorld.translation);
-                    else if (distanceMag > 10 && distanceMag < 16.5)
+                    else if (distanceMag > 10 && distanceMag < 25)
                         this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
-                            new fCore.Vector3(playerForward.x * this.throwStrength * 0.7, distanceMag * 3, playerForward.z * this.throwStrength * 0.7),
+                            new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 8, playerForward.z * this.throwStrength),
                             this.enemyContainer.mtxWorld.translation);
                     else if (distanceMag < 10)
                         this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
-                            new fCore.Vector3(playerForward.x * this.throwStrength * 0.525, distanceMag * 3, playerForward.z * this.throwStrength * 0.525),
+                            new fCore.Vector3(playerForward.x * 0.75 * this.throwStrength, distanceMag * 9, playerForward.z * 0.75 * this.throwStrength),
                             this.enemyContainer.mtxWorld.translation);
                     this.basketBalls[0].getComponent(BasketBallsController).isInFlight = false;
                     this.basketBalls[0].getComponent(BasketBallsController).isInUse = false;
                     this.hasGrabbed = false;
-
                 }
             }
         }
 
-        public moveToAvailableBalls = (): void => {
+        private moveToAvailableBalls = (): void => {
 
             if (this.basketBalls[0].getComponent(BasketBallsController).isInUse) {
                 let distanceHomeMag: number = fCore.Vector3.DIFFERENCE(this.containerMesh.mtxWorld.translation, this.enemyContainer.mtxWorld.translation).magnitude;

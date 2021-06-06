@@ -5,9 +5,14 @@ var basketBallBattleRoyale;
     class GameState extends FudgeCore.Mutable {
         constructor() {
             super(...arguments);
-            this.hits = "";
+            this.hitsAvatar = "";
+            this.hitsEnemyBlue = "";
+            this.hitsEnemyRed = "";
+            this.hitsEnemyMagenta = "";
         }
-        reduceMutator(_mutator) { }
+        // tslint:disable-next-line: no-empty
+        reduceMutator(_mutator) {
+        }
     }
     basketBallBattleRoyale.GameState = GameState;
     basketBallBattleRoyale.gameState = new GameState();
