@@ -52,7 +52,7 @@ namespace basketBallBattleRoyale {
         }
 
         private update = (): void => {
-            // this.moveToAvailableBalls();
+            this.moveToAvailableBalls();
             if (!this.hasGrabbed) return;
             if (this.basketBalls[0].getComponent(BasketBallsController).isInUse) {
                 if (!this.basketBalls[0].getComponent(BasketBallsController).isInFlight) {

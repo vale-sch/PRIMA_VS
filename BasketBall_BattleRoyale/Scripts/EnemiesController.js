@@ -18,7 +18,7 @@ var basketBallBattleRoyale;
                 });
             };
             this.update = () => {
-                // this.moveToAvailableBalls();
+                this.moveToAvailableBalls();
                 if (!this.hasGrabbed)
                     return;
                 if (this.basketBalls[0].getComponent(basketBallBattleRoyale.BasketBallsController).isInUse) {
