@@ -63,6 +63,10 @@ namespace basketBallBattleRoyale {
     staticEnvContainer = bskBallRoot.getChild(0);
     floorContainer = staticEnvContainer.getChild(0).getChild(0);
 
+    let response: Response = await fetch("./JSON/Config.json");
+    let textResponse: string = await response.text();
+    console.log(textResponse);
+
     basketBallContainer = bskBallRoot.getChild(1);
     basketBalls = basketBallContainer.getChild(1).getChildren();
     playersContainer = basketBallContainer.getChild(0);
@@ -122,15 +126,25 @@ namespace basketBallBattleRoyale {
     //floorTiles
     let counterFloorTiles: number = 0;
     for (let floorTile of floorContainer.getChildren()) {
-      if (counterFloorTiles != 0)
+      if (counterFloorTiles == 0) {
+
+        let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
+          0,
+          fCore.PHYSICS_TYPE.STATIC,
+          fCore.COLLIDER_TYPE.CYLINDER,
+          fCore.PHYSICS_GROUP.DEFAULT
+        );
+        floorTile.addComponent(staticRgdbdy);
+      } else {
         cmpMeshFloorTiles[counterFloorTiles] = floorTile.getComponent(fCore.ComponentMesh);
-      let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-        0,
-        fCore.PHYSICS_TYPE.STATIC,
-        fCore.COLLIDER_TYPE.CUBE,
-        fCore.PHYSICS_GROUP.DEFAULT
-      );
-      floorTile.addComponent(staticRgdbdy);
+        let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
+          0,
+          fCore.PHYSICS_TYPE.STATIC,
+          fCore.COLLIDER_TYPE.CUBE,
+          fCore.PHYSICS_GROUP.DEFAULT
+        );
+        floorTile.addComponent(staticRgdbdy);
+      }
       counterFloorTiles++;
     }
 

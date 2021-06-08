@@ -13,7 +13,7 @@ namespace basketBallBattleRoyale {
         private containerMesh: fCore.Node;
         private enemyContainer: fCore.Node;
         private childAvatarNode: fCore.Node;
-        private throwStrength: number = 12;
+        private throwStrength: number = 5;
         private containerTriggers: fCore.ComponentMesh[];
         private rgdBdyEnemy: fCore.ComponentRigidbody;
 
@@ -82,15 +82,15 @@ namespace basketBallBattleRoyale {
 
 
                     console.log(distanceMag);
-                    if (distanceMag > 25)
+                    if (distanceMag > 50)
                         this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
                             new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 7, playerForward.z * this.throwStrength),
                             this.enemyContainer.mtxWorld.translation);
-                    else if (distanceMag > 10 && distanceMag < 25)
+                    else if (distanceMag > 30 && distanceMag < 50)
                         this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
                             new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 8, playerForward.z * this.throwStrength),
                             this.enemyContainer.mtxWorld.translation);
-                    else if (distanceMag < 10)
+                    else if (distanceMag < 30)
                         this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(
                             new fCore.Vector3(playerForward.x * 0.75 * this.throwStrength, distanceMag * 9, playerForward.z * 0.75 * this.throwStrength),
                             this.enemyContainer.mtxWorld.translation);
@@ -105,7 +105,7 @@ namespace basketBallBattleRoyale {
 
             if (this.basketBalls[0].getComponent(BasketBallsController).isInUse) {
                 let distanceHomeMag: number = fCore.Vector3.DIFFERENCE(this.containerMesh.mtxWorld.translation, this.enemyContainer.mtxWorld.translation).magnitude;
-                if (distanceHomeMag > 4)
+                if (distanceHomeMag > 10)
                     this.rgdBdyEnemy.addVelocity(new fCore.Vector3((this.containerMesh.mtxWorld.translation.x - this.enemyContainer.mtxWorld.translation.x) / (distanceHomeMag * this.movementSpeed), 0, (this.containerMesh.mtxWorld.translation.z - this.enemyContainer.mtxWorld.translation.z) / (distanceHomeMag * this.movementSpeed)));
                 else
                     this.rgdBdyEnemy.setVelocity(fCore.Vector3.ZERO());

@@ -6,7 +6,7 @@ var basketBallBattleRoyale;
     class EnemiesController extends fCore.ComponentScript {
         constructor(_containerEnemy, _containerMesh, _rgdBdyEnemy, _score, _basketBalls, _containerTriggers) {
             super();
-            this.throwStrength = 12;
+            this.throwStrength = 5;
             this.waitTime = 2;
             this.movementSpeed = 1.25;
             this.whoAmI = () => {
@@ -43,11 +43,11 @@ var basketBallBattleRoyale;
                         let playerForward = new fCore.Vector3(this.rndChosenTarget.mtxWorld.translation.x - this.enemyContainer.mtxWorld.translation.x, 0, this.rndChosenTarget.mtxWorld.translation.z - this.enemyContainer.mtxWorld.translation.z);
                         playerForward.transform(this.rndChosenTarget.mtxWorld, false);
                         console.log(distanceMag);
-                        if (distanceMag > 25)
+                        if (distanceMag > 50)
                             this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 7, playerForward.z * this.throwStrength), this.enemyContainer.mtxWorld.translation);
-                        else if (distanceMag > 10 && distanceMag < 25)
+                        else if (distanceMag > 30 && distanceMag < 50)
                             this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(new fCore.Vector3(playerForward.x * this.throwStrength, distanceMag * 8, playerForward.z * this.throwStrength), this.enemyContainer.mtxWorld.translation);
-                        else if (distanceMag < 10)
+                        else if (distanceMag < 30)
                             this.basketBalls[0].getComponent(fCore.ComponentRigidbody).applyImpulseAtPoint(new fCore.Vector3(playerForward.x * 0.75 * this.throwStrength, distanceMag * 9, playerForward.z * 0.75 * this.throwStrength), this.enemyContainer.mtxWorld.translation);
                         this.basketBalls[0].getComponent(basketBallBattleRoyale.BasketBallsController).isInFlight = false;
                         this.basketBalls[0].getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
@@ -58,7 +58,7 @@ var basketBallBattleRoyale;
             this.moveToAvailableBalls = () => {
                 if (this.basketBalls[0].getComponent(basketBallBattleRoyale.BasketBallsController).isInUse) {
                     let distanceHomeMag = fCore.Vector3.DIFFERENCE(this.containerMesh.mtxWorld.translation, this.enemyContainer.mtxWorld.translation).magnitude;
-                    if (distanceHomeMag > 4)
+                    if (distanceHomeMag > 10)
                         this.rgdBdyEnemy.addVelocity(new fCore.Vector3((this.containerMesh.mtxWorld.translation.x - this.enemyContainer.mtxWorld.translation.x) / (distanceHomeMag * this.movementSpeed), 0, (this.containerMesh.mtxWorld.translation.z - this.enemyContainer.mtxWorld.translation.z) / (distanceHomeMag * this.movementSpeed)));
                     else
                         this.rgdBdyEnemy.setVelocity(fCore.Vector3.ZERO());
