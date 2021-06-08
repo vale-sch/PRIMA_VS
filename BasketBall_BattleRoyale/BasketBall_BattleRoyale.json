@@ -157,6 +157,22 @@
       "type": "MeshCube"
     }
   },
+  "MeshRotation|2021-06-08T15:26:43.475Z|70891": {
+    "ƒ.MeshRotation": {
+      "idResource": "MeshRotation|2021-06-08T15:26:43.475Z|70891",
+      "name": "meshCylinder",
+      "type": "MeshRotation",
+      "shape": {
+        "ƒ.Vector2": [
+          "[0, 0.5]",
+          "[0.5, 0.5]",
+          "[0.5, -0.5]"
+        ]
+      },
+      "fitTexture": true,
+      "sectors": 15
+    }
+  },
   "Graph|2021-06-02T10:15:15.171Z|84209": {
     "ƒ.Graph": {
       "name": "BasketBallBattleRoyale",
@@ -231,7 +247,7 @@
                                   {
                                     "ƒ.ComponentTransform": {
                                       "local": {
-                                        "translation": "[0, 0, 0]",
+                                        "translation": "[0, -0.5, 0]",
                                         "rotation": "[0, 0, 0]",
                                         "scaling": "[1, 1, 1]"
                                       },
@@ -3442,22 +3458,6 @@
           }
         ]
       }
-    }
-  },
-  "MeshRotation|2021-06-08T15:26:43.475Z|70891": {
-    "ƒ.MeshRotation": {
-      "idResource": "MeshRotation|2021-06-08T15:26:43.475Z|70891",
-      "name": "meshCylinder",
-      "type": "MeshRotation",
-      "shape": {
-        "ƒ.Vector2": [
-          "[0, 0.5]",
-          "[0.5, 0.5]",
-          "[0.5, -0.5]"
-        ]
-      },
-      "fitTexture": true,
-      "sectors": 15
     }
   }
 }
