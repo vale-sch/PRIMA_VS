@@ -83,8 +83,11 @@ namespace basketBallBattleRoyale {
     fCore.Physics.adjustTransforms(bskBallRoot, true);
 
     //deactivate pre build meshes from editor, only colliders were needed
-    for (let collMeshStand of collMeshesOfBasketStand)
-      collMeshStand.activate(false);
+    for (let collMeshBasket of collMeshesOfBasketStand) {
+      collMeshBasket.activate(false);
+      collMeshBasket.getContainer().getParent().getChild(0).activate(false);
+    }
+
     for (let collMeshTrigger of collMeshesOfBasketTrigger)
       collMeshTrigger.activate(false);
     for (let cmpMeshFloorTile of cmpMeshFloorTiles)
@@ -123,6 +126,17 @@ namespace basketBallBattleRoyale {
   }
 
   function createandHandleRigidbodies(): void {
+    //basketBalls
+    let dynamicRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
+      25,
+      fCore.PHYSICS_TYPE.DYNAMIC,
+      fCore.COLLIDER_TYPE.SPHERE,
+      fCore.PHYSICS_GROUP.GROUP_2
+    );
+    dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
+    for (let basketBall of basketBalls)
+      basketBall.addComponent(dynamicRgdbdy);
+
     //floorTiles
     let counterFloorTiles: number = 0;
     for (let floorTile of floorContainer.getChildren()) {
@@ -148,16 +162,6 @@ namespace basketBallBattleRoyale {
       counterFloorTiles++;
     }
 
-    //basketBalls
-    let dynamicRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-      25,
-      fCore.PHYSICS_TYPE.DYNAMIC,
-      fCore.COLLIDER_TYPE.SPHERE,
-      fCore.PHYSICS_GROUP.GROUP_2
-    );
-    for (let basketBall of basketBalls)
-      basketBall.addComponent(dynamicRgdbdy);
-
     //Basket, Stand and other Colliders of Players 
     let counterStand: number = 0;
     let counterTrigger: number = 0;
@@ -165,7 +169,17 @@ namespace basketBallBattleRoyale {
       for (let containerOfMesh of player.getChildren()) {
         for (let mesh of containerOfMesh.getChildren()) {
           if (mesh.name == "Mesh") {
-            collMeshesOfBasketStand[counterStand] = mesh.getComponent(fCore.ComponentMesh);
+            for (let meshChild of mesh.getChild(1).getChildren()) {
+              let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
+                0,
+                fCore.PHYSICS_TYPE.STATIC,
+                fCore.COLLIDER_TYPE.CUBE,
+                fCore.PHYSICS_GROUP.DEFAULT
+              );
+              meshChild.addComponent(staticRgdbdy);
+            }
+
+            collMeshesOfBasketStand[counterStand] = mesh.getChild(0).getChild(1).getComponent(fCore.ComponentMesh);
             counterStand++;
             let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
               0,
@@ -173,8 +187,22 @@ namespace basketBallBattleRoyale {
               fCore.COLLIDER_TYPE.CUBE,
               fCore.PHYSICS_GROUP.DEFAULT
             );
-            mesh.mtxLocal.translateY(-1.5);
-            mesh.addComponent(staticRgdbdy);
+            let staticRgdbdy1: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
+              0,
+              fCore.PHYSICS_TYPE.STATIC,
+              fCore.COLLIDER_TYPE.CUBE,
+              fCore.PHYSICS_GROUP.DEFAULT
+            );
+            mesh.getChild(0).addComponent(staticRgdbdy);
+            mesh.getChild(0).getChild(0).addComponent(staticRgdbdy1);
+            let staticRgdbdy2: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
+              0,
+              fCore.PHYSICS_TYPE.STATIC,
+              fCore.COLLIDER_TYPE.CUBE,
+              fCore.PHYSICS_GROUP.DEFAULT
+            );
+            mesh.getChild(0).getChild(1).addComponent(staticRgdbdy2);
+            mesh.getChild(0).getChild(1).mtxWorld.translateZ(-2);
           }
           if (mesh.name == "Trigger") {
             collMeshesOfBasketTrigger[counterTrigger] = mesh.getComponent(fCore.ComponentMesh);
