@@ -4,8 +4,8 @@ namespace basketBallBattleRoyale {
 
     fCore.Project.registerScriptNamespace(basketBallBattleRoyale);
     export class BasketBallsController extends fCore.ComponentScript {
-        public isInUse: boolean;
-        public isInFlight: boolean;
+        public isInUse: boolean = false;
+        public isInFlight: boolean = false;
         constructor() {
             super();
         }

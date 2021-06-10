@@ -6,6 +6,8 @@ var basketBallBattleRoyale;
     class BasketBallsController extends fCore.ComponentScript {
         constructor() {
             super();
+            this.isInUse = false;
+            this.isInFlight = false;
         }
     }
     basketBallBattleRoyale.BasketBallsController = BasketBallsController;
