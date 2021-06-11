@@ -81,7 +81,7 @@ namespace basketBallBattleRoyale {
   export let players: fCore.Node[] = new Array(new fCore.Node(""));
   export let avatarNode: fCore.Node;
   export let cmpCamera: fCore.ComponentCamera;
-
+  export let cylFloor: fCore.Node;
   export let canvas: HTMLCanvasElement;
 
   let cmpMeshFloorTiles: fCore.ComponentMesh[] = new Array(new fCore.ComponentMesh());
@@ -203,25 +203,25 @@ namespace basketBallBattleRoyale {
   function createandHandleRigidbodies(): void {
     //floorTiles
     let counterFloorTiles: number = 0;
-    for (let floorTile of floorContainer.getChildren()) {
+    for (let cylinderFloorAndWallColl of floorContainer.getChildren()) {
       if (counterFloorTiles == 0) {
-
         let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
           0,
           fCore.PHYSICS_TYPE.STATIC,
           fCore.COLLIDER_TYPE.CYLINDER,
           fCore.PHYSICS_GROUP.DEFAULT
         );
-        floorTile.addComponent(staticRgdbdy);
+        cylFloor = cylinderFloorAndWallColl;
+        cylinderFloorAndWallColl.addComponent(staticRgdbdy);
       } else {
-        cmpMeshFloorTiles[counterFloorTiles] = floorTile.getComponent(fCore.ComponentMesh);
+        cmpMeshFloorTiles[counterFloorTiles] = cylinderFloorAndWallColl.getComponent(fCore.ComponentMesh);
         let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
           0,
           fCore.PHYSICS_TYPE.STATIC,
           fCore.COLLIDER_TYPE.CUBE,
           fCore.PHYSICS_GROUP.DEFAULT
         );
-        floorTile.addComponent(staticRgdbdy);
+        cylinderFloorAndWallColl.addComponent(staticRgdbdy);
       }
       counterFloorTiles++;
     }
@@ -305,9 +305,9 @@ namespace basketBallBattleRoyale {
 
         let body: fCore.Node = player.getChild(1);
         let dynamicEnemyRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-          100,
+          50,
           fCore.PHYSICS_TYPE.DYNAMIC,
-          fCore.COLLIDER_TYPE.SPHERE,
+          fCore.COLLIDER_TYPE.CAPSULE,
           fCore.PHYSICS_GROUP.DEFAULT
         );
         dynamicEnemyRgdbdy.restitution = 0.1;

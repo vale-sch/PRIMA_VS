@@ -7,6 +7,7 @@ var basketBallBattleRoyale;
         constructor() {
             super();
             this.isInUse = false;
+            this.isInEnemysTargetAlready = false;
         }
     }
     basketBallBattleRoyale.BasketBallsController = BasketBallsController;

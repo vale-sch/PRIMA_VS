@@ -6,7 +6,7 @@ var basketBallBattleRoyale;
     class BasketBallSpawner {
         constructor() {
             this.update = () => {
-                if (basketBallBattleRoyale.players.length - 3 > this.checkBasketBallsAmount() && !this.isSpawning) {
+                if (basketBallBattleRoyale.players.length > this.checkBasketBallsAmount() && !this.isSpawning) {
                     let rndPos = new fCore.Vector3(new fCore.Random().getRange(-20, 20), new fCore.Random().getRange(20, 30), new fCore.Random().getRange(-20, 20));
                     this.spawnBalls(rndPos);
                 }
@@ -24,6 +24,7 @@ var basketBallBattleRoyale;
             let basketBallCloneGraph = await fCore.Project.createGraphInstance(basketBallBattleRoyale.basketBallGraphInstance);
             let dynamicRgdbdy = new fCore.ComponentRigidbody(25, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
             dynamicRgdbdy.friction = 1;
+            dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
             basketBallCloneGraph.getChild(0).addComponent(dynamicRgdbdy);
             basketBallBattleRoyale.basketBallContainer.getChild(1).appendChild(basketBallCloneGraph);
             dynamicRgdbdy.setPosition(_rndPos);

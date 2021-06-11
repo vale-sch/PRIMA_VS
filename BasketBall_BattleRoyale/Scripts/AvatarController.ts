@@ -303,9 +303,12 @@ namespace basketBallBattleRoyale {
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
-            this.actualChosenBall.getComponent(BasketBallsController).isInUse = false;
-            this.actualChosenBall = undefined;
-
+            let timer: number = 2;
+            timer -= fCore.Loop.timeFrameReal / 1000;
+            if (timer <= 0) {
+                this.actualChosenBall.getComponent(BasketBallsController).isInUse = false;
+                this.actualChosenBall = undefined;
+            }
         }
     }
 }

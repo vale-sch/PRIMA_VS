@@ -155,15 +155,16 @@ var basketBallBattleRoyale;
     function createandHandleRigidbodies() {
         //floorTiles
         let counterFloorTiles = 0;
-        for (let floorTile of floorContainer.getChildren()) {
+        for (let cylinderFloorAndWallColl of floorContainer.getChildren()) {
             if (counterFloorTiles == 0) {
                 let staticRgdbdy = new fCore.ComponentRigidbody(0, fCore.PHYSICS_TYPE.STATIC, fCore.COLLIDER_TYPE.CYLINDER, fCore.PHYSICS_GROUP.DEFAULT);
-                floorTile.addComponent(staticRgdbdy);
+                basketBallBattleRoyale.cylFloor = cylinderFloorAndWallColl;
+                cylinderFloorAndWallColl.addComponent(staticRgdbdy);
             }
             else {
-                cmpMeshFloorTiles[counterFloorTiles] = floorTile.getComponent(fCore.ComponentMesh);
+                cmpMeshFloorTiles[counterFloorTiles] = cylinderFloorAndWallColl.getComponent(fCore.ComponentMesh);
                 let staticRgdbdy = new fCore.ComponentRigidbody(0, fCore.PHYSICS_TYPE.STATIC, fCore.COLLIDER_TYPE.CUBE, fCore.PHYSICS_GROUP.DEFAULT);
-                floorTile.addComponent(staticRgdbdy);
+                cylinderFloorAndWallColl.addComponent(staticRgdbdy);
             }
             counterFloorTiles++;
         }
@@ -216,7 +217,7 @@ var basketBallBattleRoyale;
         for (let player of basketBallBattleRoyale.playersContainer.getChildren()) {
             if (player.name != "AvatarsContainer") {
                 let body = player.getChild(1);
-                let dynamicEnemyRgdbdy = new fCore.ComponentRigidbody(100, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.DEFAULT);
+                let dynamicEnemyRgdbdy = new fCore.ComponentRigidbody(50, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
                 dynamicEnemyRgdbdy.restitution = 0.1;
                 dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
                 dynamicEnemyRgdbdy.friction = 100;

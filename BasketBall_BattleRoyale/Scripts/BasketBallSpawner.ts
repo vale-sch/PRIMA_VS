@@ -22,7 +22,7 @@ namespace basketBallBattleRoyale {
         }
 
         private update = (): void => {
-            if (players.length - 3 > this.checkBasketBallsAmount() && !this.isSpawning) {
+            if (players.length > this.checkBasketBallsAmount() && !this.isSpawning) {
                 let rndPos: fCore.Vector3 = new fCore.Vector3(new fCore.Random().getRange(-20, 20), new fCore.Random().getRange(20, 30), new fCore.Random().getRange(-20, 20));
                 this.spawnBalls(rndPos);
             }
@@ -38,7 +38,7 @@ namespace basketBallBattleRoyale {
                 fCore.PHYSICS_GROUP.GROUP_2
             );
             dynamicRgdbdy.friction = 1;
-
+            dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
 
             basketBallCloneGraph.getChild(0).addComponent(dynamicRgdbdy);
             basketBallContainer.getChild(1).appendChild(basketBallCloneGraph);

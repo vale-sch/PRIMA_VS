@@ -226,8 +226,12 @@ var basketBallBattleRoyale;
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
-            this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
-            this.actualChosenBall = undefined;
+            let timer = 2;
+            timer -= fCore.Loop.timeFrameReal / 1000;
+            if (timer <= 0) {
+                this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
+                this.actualChosenBall = undefined;
+            }
         }
     }
     basketBallBattleRoyale.AvatarController = AvatarController;
