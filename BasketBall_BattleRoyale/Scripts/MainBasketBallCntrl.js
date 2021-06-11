@@ -14,7 +14,6 @@ var basketBallBattleRoyale;
     function hndTriggerAvatar(_event) {
         if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
             _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
-            _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInFlight = false;
             // tslint:disable-next-line: no-use-before-declare
             basketBallBattleRoyale.basketBalls.forEach(basketBall => {
                 if (basketBall.getParent() == _event.cmpRigidbody.getContainer().getParent()) {
@@ -30,7 +29,6 @@ var basketBallBattleRoyale;
     function hndTriggerEnemyBlue(_event) {
         if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
             _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
-            _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInFlight = false;
             // tslint:disable-next-line: no-use-before-declare
             basketBallBattleRoyale.basketBalls.forEach(basketBall => {
                 if (basketBall.getParent() == _event.cmpRigidbody.getContainer().getParent()) {
@@ -46,7 +44,6 @@ var basketBallBattleRoyale;
     function hndTriggerEnemyRed(_event) {
         if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
             _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
-            _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInFlight = false;
             // tslint:disable-next-line: no-use-before-declare
             basketBallBattleRoyale.basketBalls.forEach(basketBall => {
                 if (basketBall.getParent() == _event.cmpRigidbody.getContainer().getParent()) {
@@ -62,7 +59,6 @@ var basketBallBattleRoyale;
     function hndTriggerEnemyMagenta(_event) {
         if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
             _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
-            _event.cmpRigidbody.getContainer().getComponent(basketBallBattleRoyale.BasketBallsController).isInFlight = false;
             // tslint:disable-next-line: no-use-before-declare
             basketBallBattleRoyale.basketBalls.forEach(basketBall => {
                 if (basketBall.getParent() == _event.cmpRigidbody.getContainer().getParent()) {
@@ -75,13 +71,10 @@ var basketBallBattleRoyale;
         }
     }
     basketBallBattleRoyale.hndTriggerEnemyMagenta = hndTriggerEnemyMagenta;
-    basketBallBattleRoyale.basketBalls = new Array(new fCore.Node(""));
     basketBallBattleRoyale.players = new Array(new fCore.Node(""));
     let cmpMeshFloorTiles = new Array(new fCore.ComponentMesh());
     let floorContainer;
     let staticEnvContainer;
-    let basketBallContainer;
-    let playersContainer;
     let collMeshesOfBasketStand = new Array(new fCore.ComponentMesh());
     let collMeshesOfBasketTrigger = new Array(new fCore.ComponentMesh());
     let rgdBdyEnemies = new Array(new fCore.ComponentRigidbody());
@@ -96,22 +89,22 @@ var basketBallBattleRoyale;
         basketBallBattleRoyale.canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
         viewport.initialize("Viewport", basketBallBattleRoyale.bskBallRoot, basketBallBattleRoyale.cmpCamera, basketBallBattleRoyale.canvas);
+        //basketBalls
+        // tslint:disable-next-line: no-unused-expression
+        new basketBallBattleRoyale.BasketBallSpawner();
+        basketBallBattleRoyale.playersContainer = basketBallBattleRoyale.basketBallContainer.getChild(0);
+        for (let i = 0; i < basketBallBattleRoyale.playersContainer.getChildren().length; i++)
+            basketBallBattleRoyale.players[i] = basketBallBattleRoyale.playersContainer.getChild(i).getChild(1);
         //get refrences of important tree hierachy objects
         staticEnvContainer = basketBallBattleRoyale.bskBallRoot.getChild(0);
         floorContainer = staticEnvContainer.getChild(0).getChild(0);
         let response = await fetch("./JSON/Config.json");
         let textResponse = await response.text();
         console.log(textResponse);
-        //basketBalls
-        basketBallContainer = basketBallBattleRoyale.bskBallRoot.getChild(1);
-        basketBallBattleRoyale.basketBallGraphInstance = fCore.Project.resources["Graph|2021-06-10T09:58:39.176Z|64274"];
-        playersContainer = basketBallContainer.getChild(0);
-        for (let i = 0; i < playersContainer.getChildren().length; i++)
-            basketBallBattleRoyale.players[i] = playersContainer.getChild(i).getChild(1);
         //create static Colliders and dynamic rigidbodies
         createandHandleRigidbodies();
         //initialize avatar
-        let avatarController = new basketBallBattleRoyale.AvatarController(playersContainer, collMeshesOfBasketTrigger, basketBallBattleRoyale.players);
+        let avatarController = new basketBallBattleRoyale.AvatarController(basketBallBattleRoyale.playersContainer, collMeshesOfBasketTrigger, basketBallBattleRoyale.players);
         avatarController.start();
         fCore.Physics.adjustTransforms(basketBallBattleRoyale.bskBallRoot, true);
         //deactivate pre build meshes from editor, only colliders were needed
@@ -124,12 +117,12 @@ var basketBallBattleRoyale;
         for (let cmpMeshFloorTile of cmpMeshFloorTiles)
             cmpMeshFloorTile.activate(false);
         basketBallBattleRoyale.Hud.start();
-        updateGameState();
+        setGameState();
         fCore.Loop.addEventListener("loopFrame" /* LOOP_FRAME */, update);
         fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
         console.log(basketBallBattleRoyale.bskBallRoot);
     }
-    function updateGameState() {
+    function setGameState() {
         basketBallBattleRoyale.gameState.hitsAvatar = "Avatar Leben: " + hitsCounteAvatar;
         basketBallBattleRoyale.gameState.hitsEnemyBlue = "EnemyBlue Leben: " + hitsCounteEnemyBlue;
         basketBallBattleRoyale.gameState.hitsEnemyRed = "EnemyRed Leben: " + hitsCounteEnemyRed;
@@ -143,16 +136,12 @@ var basketBallBattleRoyale;
             if (removingTime <= 0) {
                 basketBallBattleRoyale.basketBalls.splice(basketBallBattleRoyale.basketBalls.indexOf(parentToRemove.getChild(0)), 1);
                 rgdBdyToRemove.getContainer().removeComponent(rgdBdyToRemove);
-                basketBallContainer.getChild(1).removeChild(parentToRemove);
+                basketBallBattleRoyale.basketBallContainer.getChild(1).removeChild(parentToRemove);
                 isRemoving = false;
                 removingTime = 1.5;
             }
         }
         //debug keyboard events
-        if (basketBallBattleRoyale.players.length > checkBasketBallsAmount()) {
-            let rndPos = new fCore.Vector3(new fCore.Random().getRange(-20, 20), new fCore.Random().getRange(20, 30), new fCore.Random().getRange(-20, 20));
-            spawnBalls(rndPos);
-        }
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.T]))
             fCore.Physics.settings.debugMode =
                 fCore.Physics.settings.debugMode ==
@@ -162,23 +151,6 @@ var basketBallBattleRoyale;
         if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.Y]))
             fCore.Physics.settings.debugDraw = !fCore.Physics.settings.debugDraw;
         viewport.draw();
-    }
-    async function spawnBalls(_rndPos) {
-        let basketBallCloneGraph = await fCore.Project.createGraphInstance(basketBallBattleRoyale.basketBallGraphInstance);
-        let dynamicRgdbdy = new fCore.ComponentRigidbody(25, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.GROUP_2);
-        dynamicRgdbdy.friction = 1;
-        dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
-        basketBallCloneGraph.getChild(0).addComponent(dynamicRgdbdy);
-        basketBallContainer.getChild(1).appendChild(basketBallCloneGraph);
-        dynamicRgdbdy.setPosition(_rndPos);
-    }
-    function checkBasketBallsAmount() {
-        let i = 0;
-        basketBallContainer.getChild(1).getChildren().forEach(basketBallGraphInstance => {
-            basketBallBattleRoyale.basketBalls[i] = basketBallGraphInstance.getChild(0);
-            i++;
-        });
-        return basketBallBattleRoyale.basketBalls.length;
     }
     function createandHandleRigidbodies() {
         //floorTiles
@@ -198,7 +170,7 @@ var basketBallBattleRoyale;
         //Basket, Stand and other Colliders of Players 
         let counterStand = 0;
         let counterTrigger = 0;
-        for (let player of playersContainer.getChildren()) {
+        for (let player of basketBallBattleRoyale.playersContainer.getChildren()) {
             for (let containerOfMesh of player.getChildren()) {
                 for (let mesh of containerOfMesh.getChildren()) {
                     if (mesh.name == "Mesh") {
@@ -241,12 +213,12 @@ var basketBallBattleRoyale;
         }
         //enemies rigidbodys
         let counterRgdBdy = 0;
-        for (let player of playersContainer.getChildren()) {
+        for (let player of basketBallBattleRoyale.playersContainer.getChildren()) {
             if (player.name != "AvatarsContainer") {
                 let body = player.getChild(1);
-                let dynamicEnemyRgdbdy = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
+                let dynamicEnemyRgdbdy = new fCore.ComponentRigidbody(100, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.SPHERE, fCore.PHYSICS_GROUP.DEFAULT);
                 dynamicEnemyRgdbdy.restitution = 0.1;
-                dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
+                dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
                 dynamicEnemyRgdbdy.friction = 100;
                 body.addComponent(dynamicEnemyRgdbdy);
                 // tslint:disable-next-line: no-unused-expression

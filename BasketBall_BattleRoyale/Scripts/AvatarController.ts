@@ -173,6 +173,7 @@ namespace basketBallBattleRoyale {
                             this.actualChosenBall = basketBall;
                         }
                     });
+                    console.log(this.nearestDistance);
                     if (this.actualChosenBall.getComponent(BasketBallsController).isInUse) return;
                     if (this.nearestDistance > throwThreshold)
                         return;
@@ -302,7 +303,9 @@ namespace basketBallBattleRoyale {
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
+            this.actualChosenBall.getComponent(BasketBallsController).isInUse = false;
             this.actualChosenBall = undefined;
+
         }
     }
 }

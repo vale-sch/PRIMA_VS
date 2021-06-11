@@ -7,7 +7,6 @@ var basketBallBattleRoyale;
         constructor() {
             super();
             this.isInUse = false;
-            this.isInFlight = false;
         }
     }
     basketBallBattleRoyale.BasketBallsController = BasketBallsController;

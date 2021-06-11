@@ -124,6 +124,7 @@ var basketBallBattleRoyale;
                             this.actualChosenBall = basketBall;
                         }
                     });
+                    console.log(this.nearestDistance);
                     if (this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse)
                         return;
                     if (this.nearestDistance > throwThreshold)
@@ -225,6 +226,7 @@ var basketBallBattleRoyale;
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
+            this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
             this.actualChosenBall = undefined;
         }
     }

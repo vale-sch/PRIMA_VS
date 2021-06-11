@@ -15,7 +15,6 @@ namespace basketBallBattleRoyale {
   export function hndTriggerAvatar(_event: fCore.EventPhysics): void {
     if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
       _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInUse = false;
-      _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInFlight = false;
       // tslint:disable-next-line: no-use-before-declare
       basketBalls.forEach(basketBall => {
         if (basketBall.getParent() == _event.cmpRigidbody.getContainer().getParent()) {
@@ -32,7 +31,7 @@ namespace basketBallBattleRoyale {
   export function hndTriggerEnemyBlue(_event: fCore.EventPhysics): void {
     if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
       _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInUse = false;
-      _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInFlight = false;
+
 
       // tslint:disable-next-line: no-use-before-declare
       basketBalls.forEach(basketBall => {
@@ -49,7 +48,6 @@ namespace basketBallBattleRoyale {
   export function hndTriggerEnemyRed(_event: fCore.EventPhysics): void {
     if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
       _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInUse = false;
-      _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInFlight = false;
 
       // tslint:disable-next-line: no-use-before-declare
       basketBalls.forEach(basketBall => {
@@ -66,7 +64,6 @@ namespace basketBallBattleRoyale {
   export function hndTriggerEnemyMagenta(_event: fCore.EventPhysics): void {
     if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
       _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInUse = false;
-      _event.cmpRigidbody.getContainer().getComponent(BasketBallsController).isInFlight = false;
 
       // tslint:disable-next-line: no-use-before-declare
       basketBalls.forEach(basketBall => {
@@ -75,16 +72,16 @@ namespace basketBallBattleRoyale {
         }
       });
       rgdBdyToRemove = _event.cmpRigidbody;
-      gameState.hitsEnemyMagenta = "EnemyMagenta Leben: " + --hitsCounteEnemyMagenta; isRemoving = true;
+      gameState.hitsEnemyMagenta = "EnemyMagenta Leben: " + --hitsCounteEnemyMagenta;
+      isRemoving = true;
     }
   }
 
-  export let basketBallGraphInstance: fCore.Graph;
-  export let basketBalls: fCore.Node[] = new Array(new fCore.Node(""));
+
   export let players: fCore.Node[] = new Array(new fCore.Node(""));
   export let avatarNode: fCore.Node;
   export let cmpCamera: fCore.ComponentCamera;
-  export let bskBallRoot: fCore.Graph;
+
   export let canvas: HTMLCanvasElement;
 
   let cmpMeshFloorTiles: fCore.ComponentMesh[] = new Array(new fCore.ComponentMesh());
@@ -92,8 +89,7 @@ namespace basketBallBattleRoyale {
 
   let floorContainer: fCore.Node;
   let staticEnvContainer: fCore.Node;
-  let basketBallContainer: fCore.Node;
-  let playersContainer: fCore.Node;
+  export let playersContainer: fCore.Node;
 
   let collMeshesOfBasketStand: fCore.ComponentMesh[] = new Array(new fCore.ComponentMesh());
   let collMeshesOfBasketTrigger: fCore.ComponentMesh[] = new Array(new fCore.ComponentMesh());
@@ -119,23 +115,25 @@ namespace basketBallBattleRoyale {
     viewport = new fCore.Viewport();
     viewport.initialize("Viewport", bskBallRoot, cmpCamera, canvas);
 
+    //basketBalls
+    // tslint:disable-next-line: no-unused-expression
+    new BasketBallSpawner();
+    playersContainer = basketBallContainer.getChild(0);
+    for (let i: number = 0; i < playersContainer.getChildren().length; i++)
+      players[i] = playersContainer.getChild(i).getChild(1);
+
+
     //get refrences of important tree hierachy objects
     staticEnvContainer = bskBallRoot.getChild(0);
     floorContainer = staticEnvContainer.getChild(0).getChild(0);
+
+
 
     let response: Response = await fetch("./JSON/Config.json");
     let textResponse: string = await response.text();
     console.log(textResponse);
 
 
-    //basketBalls
-    basketBallContainer = bskBallRoot.getChild(1);
-    basketBallGraphInstance = <fCore.Graph>fCore.Project.resources["Graph|2021-06-10T09:58:39.176Z|64274"];
-
-
-    playersContainer = basketBallContainer.getChild(0);
-    for (let i: number = 0; i < playersContainer.getChildren().length; i++)
-      players[i] = playersContainer.getChild(i).getChild(1);
 
 
     //create static Colliders and dynamic rigidbodies
@@ -157,7 +155,7 @@ namespace basketBallBattleRoyale {
     for (let cmpMeshFloorTile of cmpMeshFloorTiles)
       cmpMeshFloorTile.activate(false);
     Hud.start();
-    updateGameState();
+    setGameState();
 
 
     fCore.Loop.addEventListener(fCore.EVENT.LOOP_FRAME, update);
@@ -166,8 +164,7 @@ namespace basketBallBattleRoyale {
     console.log(bskBallRoot);
   }
 
-  function updateGameState(): void {
-
+  function setGameState(): void {
     gameState.hitsAvatar = "Avatar Leben: " + hitsCounteAvatar;
     gameState.hitsEnemyBlue = "EnemyBlue Leben: " + hitsCounteEnemyBlue;
     gameState.hitsEnemyRed = "EnemyRed Leben: " + hitsCounteEnemyRed;
@@ -176,6 +173,7 @@ namespace basketBallBattleRoyale {
 
   async function update(): Promise<void> {
     ƒ.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);
+
     //sub functionality of triggers
     if (isRemoving) {
       removingTime -= fCore.Loop.timeFrameReal / 1000;
@@ -188,13 +186,7 @@ namespace basketBallBattleRoyale {
         removingTime = 1.5;
       }
     }
-
     //debug keyboard events
-    if (players.length > checkBasketBallsAmount()) {
-      let rndPos: fCore.Vector3 = new fCore.Vector3(new fCore.Random().getRange(-20, 20), new fCore.Random().getRange(20, 30), new fCore.Random().getRange(-20, 20));
-      spawnBalls(rndPos);
-    }
-
     if (fCore.Keyboard.isPressedOne([fCore.KEYBOARD_CODE.T]))
       fCore.Physics.settings.debugMode =
         fCore.Physics.settings.debugMode ==
@@ -206,37 +198,9 @@ namespace basketBallBattleRoyale {
 
     viewport.draw();
   }
-  async function spawnBalls(_rndPos: fCore.Vector3): Promise<void> {
-    let basketBallCloneGraph: fCore.GraphInstance = await fCore.Project.createGraphInstance(basketBallGraphInstance);
-    let dynamicRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-      25,
-      fCore.PHYSICS_TYPE.DYNAMIC,
-      fCore.COLLIDER_TYPE.SPHERE,
-      fCore.PHYSICS_GROUP.GROUP_2
-    );
-    dynamicRgdbdy.friction = 1;
-    dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
 
-
-    basketBallCloneGraph.getChild(0).addComponent(dynamicRgdbdy);
-    basketBallContainer.getChild(1).appendChild(basketBallCloneGraph);
-
-    dynamicRgdbdy.setPosition(_rndPos);
-
-  }
-
-  function checkBasketBallsAmount(): number {
-    let i: number = 0;
-    basketBallContainer.getChild(1).getChildren().forEach(basketBallGraphInstance => {
-      basketBalls[i] = basketBallGraphInstance.getChild(0);
-      i++;
-    });
-    return basketBalls.length;
-  }
 
   function createandHandleRigidbodies(): void {
-
-
     //floorTiles
     let counterFloorTiles: number = 0;
     for (let floorTile of floorContainer.getChildren()) {
@@ -341,13 +305,13 @@ namespace basketBallBattleRoyale {
 
         let body: fCore.Node = player.getChild(1);
         let dynamicEnemyRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-          75,
+          100,
           fCore.PHYSICS_TYPE.DYNAMIC,
-          fCore.COLLIDER_TYPE.CAPSULE,
+          fCore.COLLIDER_TYPE.SPHERE,
           fCore.PHYSICS_GROUP.DEFAULT
         );
         dynamicEnemyRgdbdy.restitution = 0.1;
-        dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
+        dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
         dynamicEnemyRgdbdy.friction = 100;
         body.addComponent(dynamicEnemyRgdbdy);
 
