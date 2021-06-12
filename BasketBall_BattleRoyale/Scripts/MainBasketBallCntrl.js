@@ -9,7 +9,7 @@ var basketBallBattleRoyale;
     let hitsCounteEnemyMagenta = 10;
     let parentToRemove;
     let isRemoving = false;
-    let removingTime = 1.5;
+    let removingTime = 0.75;
     let rgdBdyToRemove;
     function hndTriggerAvatar(_event) {
         if (_event.cmpRigidbody.getContainer().name == "BasketBallPrefab") {
@@ -89,18 +89,18 @@ var basketBallBattleRoyale;
         basketBallBattleRoyale.canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
         viewport.initialize("Viewport", basketBallBattleRoyale.bskBallRoot, basketBallBattleRoyale.cmpCamera, basketBallBattleRoyale.canvas);
-        //basketBalls
-        // tslint:disable-next-line: no-unused-expression
-        new basketBallBattleRoyale.BasketBallSpawner();
-        basketBallBattleRoyale.playersContainer = basketBallBattleRoyale.basketBallContainer.getChild(0);
-        for (let i = 0; i < basketBallBattleRoyale.playersContainer.getChildren().length; i++)
-            basketBallBattleRoyale.players[i] = basketBallBattleRoyale.playersContainer.getChild(i).getChild(1);
         //get refrences of important tree hierachy objects
         staticEnvContainer = basketBallBattleRoyale.bskBallRoot.getChild(0);
         floorContainer = staticEnvContainer.getChild(0).getChild(0);
         let response = await fetch("./JSON/Config.json");
         let textResponse = await response.text();
         console.log(textResponse);
+        //basketBalls
+        // tslint:disable-next-line: no-unused-expression
+        new basketBallBattleRoyale.BasketBallSpawner();
+        basketBallBattleRoyale.playersContainer = basketBallBattleRoyale.basketBallContainer.getChild(0);
+        for (let i = 0; i < basketBallBattleRoyale.playersContainer.getChildren().length; i++)
+            basketBallBattleRoyale.players[i] = basketBallBattleRoyale.playersContainer.getChild(i).getChild(1);
         //create static Colliders and dynamic rigidbodies
         createandHandleRigidbodies();
         //initialize avatar
@@ -138,7 +138,7 @@ var basketBallBattleRoyale;
                 rgdBdyToRemove.getContainer().removeComponent(rgdBdyToRemove);
                 basketBallBattleRoyale.basketBallContainer.getChild(1).removeChild(parentToRemove);
                 isRemoving = false;
-                removingTime = 1.5;
+                removingTime = 0.75;
             }
         }
         //debug keyboard events

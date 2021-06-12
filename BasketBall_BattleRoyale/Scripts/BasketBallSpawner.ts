@@ -23,7 +23,7 @@ namespace basketBallBattleRoyale {
 
         private update = (): void => {
             if (players.length > this.checkBasketBallsAmount() && !this.isSpawning) {
-                let rndPos: fCore.Vector3 = new fCore.Vector3(new fCore.Random().getRange(-20, 20), new fCore.Random().getRange(20, 30), new fCore.Random().getRange(-20, 20));
+                let rndPos: fCore.Vector3 = new fCore.Vector3(new fCore.Random().getRange(-15, 15), new fCore.Random().getRange(20, 100), new fCore.Random().getRange(-15, 15));
                 this.spawnBalls(rndPos);
             }
         }
@@ -38,7 +38,7 @@ namespace basketBallBattleRoyale {
                 fCore.PHYSICS_GROUP.GROUP_2
             );
             dynamicRgdbdy.friction = 1;
-            dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.ZERO();
+            dynamicRgdbdy.rotationInfluenceFactor = fCore.Vector3.Z(-1);
 
             basketBallCloneGraph.getChild(0).addComponent(dynamicRgdbdy);
             basketBallContainer.getChild(1).appendChild(basketBallCloneGraph);
@@ -49,6 +49,7 @@ namespace basketBallBattleRoyale {
 
         private checkBasketBallsAmount(): number {
             let i: number = 0;
+            basketBalls = new Array(new fCore.Node(""));
             basketBallContainer.getChild(1).getChildren().forEach(basketBallGraphInstance => {
                 basketBalls[i] = basketBallGraphInstance.getChild(0);
                 i++;

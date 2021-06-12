@@ -63,7 +63,8 @@ namespace basketBallBattleRoyale {
         private targetPlayersName: string;
 
         private isGrabbed: boolean;
-
+        private timer: number;
+        private hasShot: boolean;
         constructor(_avatarsContainer: fCore.Node, _collMeshesOfBasketTrigger: fCore.ComponentMesh[], _players: fCore.Node[]) {
             this.avatarsContainer = _avatarsContainer;
             this.collMeshesOfBasketTrigger = _collMeshesOfBasketTrigger;
@@ -109,6 +110,19 @@ namespace basketBallBattleRoyale {
         }
 
         private update = (): void => {
+
+            if (this.hasShot) {
+                this.timer -= fCore.Loop.timeFrameReal / 1000;
+                if (this.timer <= 0) {
+                    this.hasShot = false;
+                    if (this.actualChosenBall) {
+                        this.actualChosenBall.getComponent(BasketBallsController).isInUse = false;
+                        this.actualChosenBall = undefined;
+                    }
+
+                }
+
+            }
             this.avatarMovement(fCore.Loop.timeFrameReal / 1000);
             this.handleInputAvatar(fCore.Loop.timeFrameReal / 1000);
 
@@ -173,7 +187,6 @@ namespace basketBallBattleRoyale {
                             this.actualChosenBall = basketBall;
                         }
                     });
-                    console.log(this.nearestDistance);
                     if (this.actualChosenBall.getComponent(BasketBallsController).isInUse) return;
                     if (this.nearestDistance > throwThreshold)
                         return;
@@ -303,12 +316,9 @@ namespace basketBallBattleRoyale {
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
-            let timer: number = 2;
-            timer -= fCore.Loop.timeFrameReal / 1000;
-            if (timer <= 0) {
-                this.actualChosenBall.getComponent(BasketBallsController).isInUse = false;
-                this.actualChosenBall = undefined;
-            }
+            this.hasShot = true;
+            this.timer = 2;
+
         }
     }
 }

@@ -46,6 +46,16 @@ var basketBallBattleRoyale;
             this.frictionFactor = 8;
             this.throwStrength = 510;
             this.update = () => {
+                if (this.hasShot) {
+                    this.timer -= fCore.Loop.timeFrameReal / 1000;
+                    if (this.timer <= 0) {
+                        this.hasShot = false;
+                        if (this.actualChosenBall) {
+                            this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
+                            this.actualChosenBall = undefined;
+                        }
+                    }
+                }
                 this.avatarMovement(fCore.Loop.timeFrameReal / 1000);
                 this.handleInputAvatar(fCore.Loop.timeFrameReal / 1000);
                 //player Grab function
@@ -124,7 +134,6 @@ var basketBallBattleRoyale;
                             this.actualChosenBall = basketBall;
                         }
                     });
-                    console.log(this.nearestDistance);
                     if (this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse)
                         return;
                     if (this.nearestDistance > throwThreshold)
@@ -226,12 +235,8 @@ var basketBallBattleRoyale;
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
-            let timer = 2;
-            timer -= fCore.Loop.timeFrameReal / 1000;
-            if (timer <= 0) {
-                this.actualChosenBall.getComponent(basketBallBattleRoyale.BasketBallsController).isInUse = false;
-                this.actualChosenBall = undefined;
-            }
+            this.hasShot = true;
+            this.timer = 2;
         }
     }
     basketBallBattleRoyale.AvatarController = AvatarController;

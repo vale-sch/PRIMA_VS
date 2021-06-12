@@ -9,7 +9,7 @@ namespace basketBallBattleRoyale {
   let hitsCounteEnemyMagenta: number = 10;
   let parentToRemove: fCore.Node;
   let isRemoving: boolean = false;
-  let removingTime: number = 1.5;
+  let removingTime: number = 0.75;
   let rgdBdyToRemove: fCore.ComponentRigidbody;
 
   export function hndTriggerAvatar(_event: fCore.EventPhysics): void {
@@ -115,12 +115,7 @@ namespace basketBallBattleRoyale {
     viewport = new fCore.Viewport();
     viewport.initialize("Viewport", bskBallRoot, cmpCamera, canvas);
 
-    //basketBalls
-    // tslint:disable-next-line: no-unused-expression
-    new BasketBallSpawner();
-    playersContainer = basketBallContainer.getChild(0);
-    for (let i: number = 0; i < playersContainer.getChildren().length; i++)
-      players[i] = playersContainer.getChild(i).getChild(1);
+
 
 
     //get refrences of important tree hierachy objects
@@ -134,10 +129,17 @@ namespace basketBallBattleRoyale {
     console.log(textResponse);
 
 
-
+    //basketBalls
+    // tslint:disable-next-line: no-unused-expression
+    new BasketBallSpawner();
+    playersContainer = basketBallContainer.getChild(0);
+    for (let i: number = 0; i < playersContainer.getChildren().length; i++)
+      players[i] = playersContainer.getChild(i).getChild(1);
 
     //create static Colliders and dynamic rigidbodies
     createandHandleRigidbodies();
+
+
     //initialize avatar
     let avatarController: AvatarController = new AvatarController(playersContainer, collMeshesOfBasketTrigger, players);
 
@@ -183,7 +185,7 @@ namespace basketBallBattleRoyale {
         basketBallContainer.getChild(1).removeChild(parentToRemove);
 
         isRemoving = false;
-        removingTime = 1.5;
+        removingTime = 0.75;
       }
     }
     //debug keyboard events
