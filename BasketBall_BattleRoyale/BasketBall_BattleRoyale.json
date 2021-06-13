@@ -173,6 +173,28 @@
       "sectors": 15
     }
   },
+  "Material|2021-06-06T13:05:54.512Z|74912": {
+    "ƒ.Material": {
+      "name": "FloorTexture",
+      "idResource": "Material|2021-06-06T13:05:54.512Z|74912",
+      "shader": "ShaderTexture",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "name": "Coat",
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2021-06-13T15:01:05.479Z|51724"
+        }
+      }
+    }
+  },
+  "TextureImage|2021-06-13T14:55:24.631Z|30213": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\TexturesCom_ReclaimedWoodWallColor_Clean_1K_albedo.png",
+      "idResource": "TextureImage|2021-06-13T14:55:24.631Z|30213",
+      "name": "Textures\\TexturesCom_ReclaimedWoodWallColor_Clean_1K_albedo.png",
+      "type": "TextureImage"
+    }
+  },
   "Graph|2021-06-02T10:15:15.171Z|84209": {
     "ƒ.Graph": {
       "name": "BasketBallBattleRoyale",
@@ -271,7 +293,7 @@
                                       "Component": {
                                         "active": true
                                       },
-                                      "idMaterial": "Material|2021-06-02T10:16:14.355Z|81418"
+                                      "idMaterial": "Material|2021-06-06T13:05:54.512Z|74912"
                                     }
                                   }
                                 ]
@@ -4476,9 +4498,9 @@
                                         {
                                           "ƒ.ComponentTransform": {
                                             "local": {
-                                              "translation": "[0, 4.149999618530273, 0]",
+                                              "translation": "[0.08999999612569809, 4.09999942779541, 0]",
                                               "rotation": "[0, 0, 0]",
-                                              "scaling": "[0.8000001907348633, 0.25, 0.6599998474121094]"
+                                              "scaling": "[0.8000001907348633, 0.25, 0.6879998445510864]"
                                             },
                                             "Component": {
                                               "active": true
@@ -5051,19 +5073,6 @@
       "type": "MeshPyramid"
     }
   },
-  "Material|2021-06-06T13:05:54.512Z|74912": {
-    "ƒ.Material": {
-      "name": "NewMaterial",
-      "idResource": "Material|2021-06-06T13:05:54.512Z|74912",
-      "shader": "ShaderTexture",
-      "coat": {
-        "ƒ.CoatTextured": {
-          "name": "Coat",
-          "color": "[1, 1, 1, 1]"
-        }
-      }
-    }
-  },
   "MeshExtrusion|2021-06-06T14:35:56.951Z|42404": {
     "ƒ.MeshExtrusion": {
       "idResource": "MeshExtrusion|2021-06-06T14:35:56.951Z|42404",
@@ -5173,7 +5182,9 @@
                 {
                   "basketBallBattleRoyale.BasketBallsController": {
                     "active": true,
-                    "isInUse": false
+                    "isInUse": false,
+                    "isInEnemysTargetAlready": false,
+                    "isInFlight": false
                   }
                 }
               ]
@@ -5184,6 +5195,14 @@
       ],
       "idResource": "Graph|2021-06-10T09:58:39.176Z|64274",
       "type": "Graph"
+    }
+  },
+  "TextureImage|2021-06-13T15:01:05.479Z|51724": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\TexturesCom_WoodPlanksFloors0010_1_seamless_S.jpg",
+      "idResource": "TextureImage|2021-06-13T15:01:05.479Z|51724",
+      "name": "Textures\\TexturesCom_WoodPlanksFloors0010_1_seamless_S.jpg",
+      "type": "TextureImage"
     }
   }
 }

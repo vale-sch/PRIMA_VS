@@ -307,18 +307,18 @@ namespace basketBallBattleRoyale {
 
         let body: fCore.Node = player.getChild(1);
         let dynamicEnemyRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
-          50,
+          75,
           fCore.PHYSICS_TYPE.DYNAMIC,
-          fCore.COLLIDER_TYPE.CAPSULE,
+          fCore.COLLIDER_TYPE.CUBE,
           fCore.PHYSICS_GROUP.DEFAULT
         );
         dynamicEnemyRgdbdy.restitution = 0.1;
         dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
-        dynamicEnemyRgdbdy.friction = 100;
+        dynamicEnemyRgdbdy.friction = 1;
         body.addComponent(dynamicEnemyRgdbdy);
 
         // tslint:disable-next-line: no-unused-expression
-        player.addComponent(new EnemiesController(player.getChild(1), player.getChild(0), dynamicEnemyRgdbdy, 10, collMeshesOfBasketTrigger));
+        player.addComponent(new EnemiesController(player.getChild(1), dynamicEnemyRgdbdy, 10, collMeshesOfBasketTrigger));
         rgdBdyEnemies[counterRgdBdy] = dynamicEnemyRgdbdy;
         counterRgdBdy++;
       }
