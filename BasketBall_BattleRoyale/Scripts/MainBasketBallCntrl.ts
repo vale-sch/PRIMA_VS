@@ -108,8 +108,8 @@ namespace basketBallBattleRoyale {
       fCore.Project.resources["Graph|2021-06-02T10:15:15.171Z|84209"]
     );
     cmpCamera = new fCore.ComponentCamera();
-    cmpCamera.clrBackground = fCore.Color.CSS("LIGHTSKYBLUE");
-    cmpCamera.mtxPivot.translateY(2);
+    cmpCamera.clrBackground = fCore.Color.CSS("LIGHTYELLOW");
+    cmpCamera.mtxPivot.translateY(2.5);
 
     canvas = document.querySelector("canvas");
     viewport = new fCore.Viewport();
@@ -309,7 +309,7 @@ namespace basketBallBattleRoyale {
         let dynamicEnemyRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
           75,
           fCore.PHYSICS_TYPE.DYNAMIC,
-          fCore.COLLIDER_TYPE.CUBE,
+          fCore.COLLIDER_TYPE.CYLINDER,
           fCore.PHYSICS_GROUP.DEFAULT
         );
         dynamicEnemyRgdbdy.restitution = 0.1;

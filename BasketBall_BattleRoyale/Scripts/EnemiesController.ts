@@ -18,7 +18,7 @@ namespace basketBallBattleRoyale {
         private actualChosenBall: fCore.Node;
         private targetedBall: fCore.Node;
         private idleTime: number = 1;
-        private movementSpeed: number = 1;
+        private movementSpeed: number = 1.2;
         private rndChosenTarget: fCore.ComponentMesh;
         private hasGrabbed: boolean = false;
         private isInGrabbingRange: boolean = false;

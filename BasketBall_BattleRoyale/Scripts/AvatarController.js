@@ -80,12 +80,12 @@ var basketBallBattleRoyale;
             fCore.Loop.start(fCore.LOOP_MODE.TIME_REAL, 60);
         }
         createAvatar() {
-            this.cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CAPSULE, fCore.PHYSICS_GROUP.DEFAULT);
+            this.cmpAvatar = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CYLINDER, fCore.PHYSICS_GROUP.DEFAULT);
             this.cmpAvatar.restitution = 0.1;
             this.cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
             this.cmpAvatar.friction = 100;
             basketBallBattleRoyale.avatarNode = new fCore.Node("AvatarNode");
-            basketBallBattleRoyale.avatarNode.addComponent(new fCore.ComponentTransform(fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(0))));
+            basketBallBattleRoyale.avatarNode.addComponent(new fCore.ComponentTransform(fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(1))));
             this.childAvatarNode = new fCore.Node("childAvatarNode");
             this.childAvatarNode.addComponent(new fCore.ComponentTransform());
             this.childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 1, 4.75));

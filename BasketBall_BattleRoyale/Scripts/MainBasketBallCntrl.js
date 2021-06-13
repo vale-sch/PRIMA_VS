@@ -84,8 +84,8 @@ var basketBallBattleRoyale;
         await fCore.Project.loadResourcesFromHTML();
         basketBallBattleRoyale.bskBallRoot = (fCore.Project.resources["Graph|2021-06-02T10:15:15.171Z|84209"]);
         basketBallBattleRoyale.cmpCamera = new fCore.ComponentCamera();
-        basketBallBattleRoyale.cmpCamera.clrBackground = fCore.Color.CSS("LIGHTSKYBLUE");
-        basketBallBattleRoyale.cmpCamera.mtxPivot.translateY(2);
+        basketBallBattleRoyale.cmpCamera.clrBackground = fCore.Color.CSS("LIGHTYELLOW");
+        basketBallBattleRoyale.cmpCamera.mtxPivot.translateY(2.5);
         basketBallBattleRoyale.canvas = document.querySelector("canvas");
         viewport = new fCore.Viewport();
         viewport.initialize("Viewport", basketBallBattleRoyale.bskBallRoot, basketBallBattleRoyale.cmpCamera, basketBallBattleRoyale.canvas);
@@ -217,7 +217,7 @@ var basketBallBattleRoyale;
         for (let player of basketBallBattleRoyale.playersContainer.getChildren()) {
             if (player.name != "AvatarsContainer") {
                 let body = player.getChild(1);
-                let dynamicEnemyRgdbdy = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CUBE, fCore.PHYSICS_GROUP.DEFAULT);
+                let dynamicEnemyRgdbdy = new fCore.ComponentRigidbody(75, fCore.PHYSICS_TYPE.DYNAMIC, fCore.COLLIDER_TYPE.CYLINDER, fCore.PHYSICS_GROUP.DEFAULT);
                 dynamicEnemyRgdbdy.restitution = 0.1;
                 dynamicEnemyRgdbdy.rotationInfluenceFactor = fCore.Vector3.Y(1);
                 dynamicEnemyRgdbdy.friction = 1;

@@ -182,9 +182,17 @@
         "ƒ.CoatTextured": {
           "name": "Coat",
           "color": "[1, 1, 1, 1]",
-          "idTexture": "TextureImage|2021-06-13T15:01:05.479Z|51724"
+          "idTexture": "TextureImage|2021-06-13T14:55:24.631Z|30213"
         }
       }
+    }
+  },
+  "TextureImage|2021-06-13T15:01:05.479Z|51724": {
+    "ƒ.TextureImage": {
+      "url": "Textures\\TexturesCom_WoodPlanksFloors0010_1_seamless_S.jpg",
+      "idResource": "TextureImage|2021-06-13T15:01:05.479Z|51724",
+      "name": "Textures\\TexturesCom_WoodPlanksFloors0010_1_seamless_S.jpg",
+      "type": "TextureImage"
     }
   },
   "TextureImage|2021-06-13T14:55:24.631Z|30213": {
@@ -5160,7 +5168,7 @@
                     "Component": {
                       "active": true
                     },
-                    "idMaterial": "Material|2021-06-03T09:48:38.027Z|98722"
+                    "idMaterial": "Material|2021-06-13T15:06:55.201Z|93003"
                   }
                 }
               ],
@@ -5197,12 +5205,18 @@
       "type": "Graph"
     }
   },
-  "TextureImage|2021-06-13T15:01:05.479Z|51724": {
-    "ƒ.TextureImage": {
-      "url": "Textures\\TexturesCom_WoodPlanksFloors0010_1_seamless_S.jpg",
-      "idResource": "TextureImage|2021-06-13T15:01:05.479Z|51724",
-      "name": "Textures\\TexturesCom_WoodPlanksFloors0010_1_seamless_S.jpg",
-      "type": "TextureImage"
+  "Material|2021-06-13T15:06:55.201Z|93003": {
+    "ƒ.Material": {
+      "name": "BasketBallTexture",
+      "idResource": "Material|2021-06-13T15:06:55.201Z|93003",
+      "shader": "ShaderTexture",
+      "coat": {
+        "ƒ.CoatTextured": {
+          "name": "Coat",
+          "color": "[1, 1, 1, 1]",
+          "idTexture": "TextureImage|2021-06-13T15:01:05.479Z|51724"
+        }
+      }
     }
   }
 }

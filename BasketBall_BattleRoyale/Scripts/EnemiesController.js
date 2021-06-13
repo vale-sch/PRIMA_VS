@@ -8,7 +8,7 @@ var basketBallBattleRoyale;
             super();
             this.throwStrength = 10;
             this.idleTime = 1;
-            this.movementSpeed = 1;
+            this.movementSpeed = 1.2;
             this.hasGrabbed = false;
             this.isInGrabbingRange = false;
             this.hasShot = false;

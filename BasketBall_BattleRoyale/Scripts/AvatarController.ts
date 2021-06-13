@@ -83,7 +83,7 @@ namespace basketBallBattleRoyale {
             this.cmpAvatar = new fCore.ComponentRigidbody(
                 75,
                 fCore.PHYSICS_TYPE.DYNAMIC,
-                fCore.COLLIDER_TYPE.CAPSULE,
+                fCore.COLLIDER_TYPE.CYLINDER,
                 fCore.PHYSICS_GROUP.DEFAULT
             );
             this.cmpAvatar.restitution = 0.1;
@@ -94,7 +94,7 @@ namespace basketBallBattleRoyale {
             avatarNode = new fCore.Node("AvatarNode");
             avatarNode.addComponent(
                 new fCore.ComponentTransform(
-                    fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(0))
+                    fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(1))
                 )
             );
 

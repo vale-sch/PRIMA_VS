@@ -23,7 +23,7 @@ namespace basketBallBattleRoyale {
 
         private update = (): void => {
             if (players.length > this.checkBasketBallsAmount() && !this.isSpawning) {
-                let rndPos: fCore.Vector3 = new fCore.Vector3(new fCore.Random().getRange(-10, 10), new fCore.Random().getRange(20, 30), new fCore.Random().getRange(-10, 10));
+                let rndPos: fCore.Vector3 = new fCore.Vector3(new fCore.Random().getRange(-15, 15), new fCore.Random().getRange(30, 60), new fCore.Random().getRange(-15, 15));
                 this.spawnBalls(rndPos);
             }
         }
