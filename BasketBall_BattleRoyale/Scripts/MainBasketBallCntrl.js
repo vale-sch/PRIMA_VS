@@ -240,7 +240,7 @@ var basketBallBattleRoyale;
                 dynamicEnemyRgdbdy.friction = 1;
                 body.addComponent(dynamicEnemyRgdbdy);
                 // tslint:disable-next-line: no-unused-expression
-                player.addComponent(new basketBallBattleRoyale.EnemiesController(player.getChild(1), dynamicEnemyRgdbdy, 10, collMeshesOfBasketTrigger));
+                player.addComponent(new basketBallBattleRoyale.EnemiesController(player.getChild(1), dynamicEnemyRgdbdy, collMeshesOfBasketTrigger));
                 rgdBdyEnemies[counterRgdBdy] = dynamicEnemyRgdbdy;
                 counterRgdBdy++;
             }

@@ -42,7 +42,6 @@ namespace basketBallBattleRoyale {
     fCore.Project.registerScriptNamespace(basketBallBattleRoyale);
 
     export class AvatarController {
-        public score: number = 10;
         private forwardMovement: number = 0;
         private backwardMovement: number = 0;
         private movementspeed: number = 5;
@@ -52,19 +51,16 @@ namespace basketBallBattleRoyale {
         private actualTarget: fCore.ComponentMesh;
         private actualChosenBall: fCore.Node;
         private cmpAvatar: fCore.ComponentRigidbody;
-
         private childAvatarNode: fCore.Node;
         private avatarsContainer: fCore.Node;
         private players: fCore.Node[];
         private collMeshesOfBasketTrigger: fCore.ComponentMesh[];
-
         private oldRayHit: ƒ.RayHitInfo;
-
         private targetPlayersName: string;
-
         private isGrabbed: boolean;
         private timer: number;
         private hasShot: boolean;
+
         constructor(_avatarsContainer: fCore.Node, _collMeshesOfBasketTrigger: fCore.ComponentMesh[], _players: fCore.Node[]) {
             this.avatarsContainer = _avatarsContainer;
             this.collMeshesOfBasketTrigger = _collMeshesOfBasketTrigger;
@@ -90,14 +86,12 @@ namespace basketBallBattleRoyale {
             this.cmpAvatar.rotationInfluenceFactor = fCore.Vector3.ZERO();
             this.cmpAvatar.friction = 100;
 
-
             avatarNode = new fCore.Node("AvatarNode");
             avatarNode.addComponent(
                 new fCore.ComponentTransform(
                     fCore.Matrix4x4.TRANSLATION(fCore.Vector3.Y(1))
                 )
             );
-
             this.childAvatarNode = new fCore.Node("childAvatarNode");
             this.childAvatarNode.addComponent(new fCore.ComponentTransform());
             this.childAvatarNode.mtxLocal.translate(new fCore.Vector3(0, 1, 4.75));
@@ -110,7 +104,6 @@ namespace basketBallBattleRoyale {
         }
 
         private update = (): void => {
-
             if (this.hasShot) {
                 this.timer -= fCore.Loop.timeFrameReal / 1000;
                 if (this.timer <= 0) {
@@ -121,12 +114,9 @@ namespace basketBallBattleRoyale {
                     }
 
                 }
-
             }
             this.avatarMovement(fCore.Loop.timeFrameReal / 1000);
             this.handleInputAvatar(fCore.Loop.timeFrameReal / 1000);
-
-            //player Grab function
             this.isGrabbingBasket();
             //sub functionality of isGrabbingObjects();
             if (this.isGrabbed) {
@@ -157,8 +147,6 @@ namespace basketBallBattleRoyale {
                 this.backwardMovement = - this.movementspeed;
             else if (this.backwardMovement <= 0) this.backwardMovement += _deltaTime * this.frictionFactor;
         }
-
-
 
         private avatarMovement(_deltaTime: number): void {
             let playerForward: fCore.Vector3;
@@ -205,7 +193,6 @@ namespace basketBallBattleRoyale {
                             }); else return;
 
                     });
-
                     //check distance to basket
                     if (!this.actualTarget) return;
                     let distance: fCore.Vector3 = fCore.Vector3.DIFFERENCE(this.actualChosenBall.mtxWorld.translation, this.actualTarget.mtxWorld.translation);
@@ -213,8 +200,6 @@ namespace basketBallBattleRoyale {
                     if (distanceMag < throwMinDistance) return;
 
                     this.shootCalculation(distanceMag);
-
-
                 }
             }
         }
@@ -255,7 +240,6 @@ namespace basketBallBattleRoyale {
             targetOfMesh.getChildren().forEach(childMesh => {
                 childMesh.getComponent(fCore.ComponentMaterial).clrPrimary.a = 0.5;
             });
-
             let playerForward: fCore.Vector3;
             playerForward = fCore.Vector3.Z();
             playerForward.transform(avatarNode.mtxWorld, false);
@@ -310,15 +294,11 @@ namespace basketBallBattleRoyale {
                         new fCore.Vector3(playerForward.x * this.throwStrength * 0.4, _distanceMag * 39, playerForward.z * this.throwStrength * 0.4),
                         avatarNode.mtxWorld.translation);
                     break;
-
-
-
             }
             this.isGrabbed = false;
             this.nearestDistance = undefined;
             this.hasShot = true;
             this.timer = 2;
-
         }
     }
 }

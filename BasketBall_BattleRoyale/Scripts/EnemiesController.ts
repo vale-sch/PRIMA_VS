@@ -5,8 +5,7 @@ namespace basketBallBattleRoyale {
     fCore.Project.registerScriptNamespace(basketBallBattleRoyale);
     export class EnemiesController extends fCore.ComponentScript {
 
-        public score: number;
-        public myBsktTrigger: fCore.ComponentMesh;
+        private myBsktTrigger: fCore.ComponentMesh;
 
         private containerEnemy: fCore.Node;
         private enemyContainer: fCore.Node;
@@ -27,12 +26,11 @@ namespace basketBallBattleRoyale {
         private allDistances: number[];
         private randomPointVec: fCore.Vector3;
 
-        constructor(_containerEnemy: fCore.Node, _rgdBdyEnemy: fCore.ComponentRigidbody, _score: number, _containerTriggers: fCore.ComponentMesh[]) {
+        constructor(_containerEnemy: fCore.Node, _rgdBdyEnemy: fCore.ComponentRigidbody, _containerTriggers: fCore.ComponentMesh[]) {
             super();
             this.containerEnemy = _containerEnemy;
             this.rgdBdyEnemy = _rgdBdyEnemy;
             this.enemyContainer = _rgdBdyEnemy.getContainer();
-            this.score = _score;
             this.containerTriggers = _containerTriggers;
 
             this.childEnemyNode = new fCore.Node("childAvatarNode");
@@ -74,7 +72,7 @@ namespace basketBallBattleRoyale {
                     return;
                 }
                 if (this.isInGrabbingRange) {
-                    this.calculateShootAction();
+                    this.calculationAndShot();
                     return;
                 }
                 this.moveToAvailableBalls();
@@ -149,7 +147,7 @@ namespace basketBallBattleRoyale {
                 }
             }
         }
-        private calculateShootAction = (): void => {
+        private calculationAndShot = (): void => {
             this.actualChosenBall.getComponent(fCore.ComponentRigidbody).setVelocity(fCore.Vector3.ZERO());
             this.actualChosenBall.getComponent(fCore.ComponentRigidbody).setRotation(fCore.Vector3.ZERO());
             this.actualChosenBall.getComponent(fCore.ComponentRigidbody).setPosition(this.childEnemyNode.mtxWorld.translation);

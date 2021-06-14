@@ -336,7 +336,7 @@ namespace basketBallBattleRoyale {
         body.addComponent(dynamicEnemyRgdbdy);
 
         // tslint:disable-next-line: no-unused-expression
-        player.addComponent(new EnemiesController(player.getChild(1), dynamicEnemyRgdbdy, 10, collMeshesOfBasketTrigger));
+        player.addComponent(new EnemiesController(player.getChild(1), dynamicEnemyRgdbdy, collMeshesOfBasketTrigger));
         rgdBdyEnemies[counterRgdBdy] = dynamicEnemyRgdbdy;
         counterRgdBdy++;
       }

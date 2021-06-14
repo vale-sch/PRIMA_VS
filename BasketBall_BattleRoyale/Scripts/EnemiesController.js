@@ -4,7 +4,7 @@ var basketBallBattleRoyale;
     var fCore = FudgeCore;
     fCore.Project.registerScriptNamespace(basketBallBattleRoyale);
     class EnemiesController extends fCore.ComponentScript {
-        constructor(_containerEnemy, _rgdBdyEnemy, _score, _containerTriggers) {
+        constructor(_containerEnemy, _rgdBdyEnemy, _containerTriggers) {
             super();
             this.throwStrength = 10;
             this.idleTime = 1;
@@ -39,7 +39,7 @@ var basketBallBattleRoyale;
                         return;
                     }
                     if (this.isInGrabbingRange) {
-                        this.calculateShootAction();
+                        this.calculationAndShot();
                         return;
                     }
                     this.moveToAvailableBalls();
@@ -109,7 +109,7 @@ var basketBallBattleRoyale;
                     }
                 }
             };
-            this.calculateShootAction = () => {
+            this.calculationAndShot = () => {
                 this.actualChosenBall.getComponent(fCore.ComponentRigidbody).setVelocity(fCore.Vector3.ZERO());
                 this.actualChosenBall.getComponent(fCore.ComponentRigidbody).setRotation(fCore.Vector3.ZERO());
                 this.actualChosenBall.getComponent(fCore.ComponentRigidbody).setPosition(this.childEnemyNode.mtxWorld.translation);
@@ -154,7 +154,6 @@ var basketBallBattleRoyale;
             this.containerEnemy = _containerEnemy;
             this.rgdBdyEnemy = _rgdBdyEnemy;
             this.enemyContainer = _rgdBdyEnemy.getContainer();
-            this.score = _score;
             this.containerTriggers = _containerTriggers;
             this.childEnemyNode = new fCore.Node("childAvatarNode");
             this.childEnemyNode.addComponent(new fCore.ComponentTransform());

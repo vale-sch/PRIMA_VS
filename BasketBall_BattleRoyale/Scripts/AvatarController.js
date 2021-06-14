@@ -39,7 +39,6 @@ var basketBallBattleRoyale;
     fCore.Project.registerScriptNamespace(basketBallBattleRoyale);
     class AvatarController {
         constructor(_avatarsContainer, _collMeshesOfBasketTrigger, _players) {
-            this.score = 10;
             this.forwardMovement = 0;
             this.backwardMovement = 0;
             this.movementspeed = 5;
@@ -58,7 +57,6 @@ var basketBallBattleRoyale;
                 }
                 this.avatarMovement(fCore.Loop.timeFrameReal / 1000);
                 this.handleInputAvatar(fCore.Loop.timeFrameReal / 1000);
-                //player Grab function
                 this.isGrabbingBasket();
                 //sub functionality of isGrabbingObjects();
                 if (this.isGrabbed) {
