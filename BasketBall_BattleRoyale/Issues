@@ -1,7 +1,8 @@
- Player: 
-farben können anscheinend doch über coat angesteuert werden
+ PlayerS:
+ Spieler Tod Funktion Implementieren
 
-Bälle:
+ Körbe:
+ CompnentSkript für jeden Korb der Event Listener an Trigger hat // evtl in main mit foreach durch und referenzen holen
 
-Mehr Bälle müssen gespawnt werden
---> ComponentSkript Ball aufsetzen für eigenes Verhalten 
+GUI: 
+Anfangs gui aufsetzen, wenn Spieler stribt/gewinnt anderes gui einblenden

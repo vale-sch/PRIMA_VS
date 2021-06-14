@@ -3,10 +3,11 @@ namespace basketBallBattleRoyale {
   import fCore = FudgeCore;
   window.addEventListener("load", start);
 
-  let hitsCounteAvatar: number = 10;
-  let hitsCounteEnemyBlue: number = 10;
-  let hitsCounteEnemyRed: number = 10;
-  let hitsCounteEnemyMagenta: number = 10;
+  let hitsCounterAvatar: number = 10;
+  let hitsCounterEnemyBlue: number = 10;
+  let hitsCounterEnemyRed: number = 10;
+  let hitsCounterEnemyMagenta: number = 10;
+  let allCounters: number[] = Array<number>(4);
   let parentToRemove: fCore.Node;
   let isRemoving: boolean = false;
   let removingTime: number = 0.75;
@@ -22,7 +23,7 @@ namespace basketBallBattleRoyale {
         }
       });
       rgdBdyToRemove = _event.cmpRigidbody;
-      gameState.hitsAvatar = "Avatar Leben: " + --hitsCounteAvatar;
+      gameState.hitsAvatar = "Avatar Leben: " + --hitsCounterAvatar;
       isRemoving = true;
 
     }
@@ -40,7 +41,7 @@ namespace basketBallBattleRoyale {
         }
       });
       rgdBdyToRemove = _event.cmpRigidbody;
-      gameState.hitsEnemyBlue = "EnemyBlue Leben: " + --hitsCounteEnemyBlue;
+      gameState.hitsEnemyBlue = "EnemyBlue Leben: " + --hitsCounterEnemyBlue;
       isRemoving = true;
     }
   }
@@ -56,7 +57,7 @@ namespace basketBallBattleRoyale {
         }
       });
       rgdBdyToRemove = _event.cmpRigidbody;
-      gameState.hitsEnemyRed = "EnemyRed Leben: " + --hitsCounteEnemyRed;
+      gameState.hitsEnemyRed = "EnemyRed Leben: " + --hitsCounterEnemyRed;
       isRemoving = true;
     }
   }
@@ -72,7 +73,7 @@ namespace basketBallBattleRoyale {
         }
       });
       rgdBdyToRemove = _event.cmpRigidbody;
-      gameState.hitsEnemyMagenta = "EnemyMagenta Leben: " + --hitsCounteEnemyMagenta;
+      gameState.hitsEnemyMagenta = "EnemyMagenta Leben: " + --hitsCounterEnemyMagenta;
       isRemoving = true;
     }
   }
@@ -108,7 +109,7 @@ namespace basketBallBattleRoyale {
       fCore.Project.resources["Graph|2021-06-02T10:15:15.171Z|84209"]
     );
     cmpCamera = new fCore.ComponentCamera();
-    cmpCamera.clrBackground = fCore.Color.CSS("LIGHTYELLOW");
+    cmpCamera.clrBackground = fCore.Color.CSS("BLACK");
     cmpCamera.mtxPivot.translateY(2.5);
 
     canvas = document.querySelector("canvas");
@@ -116,10 +117,10 @@ namespace basketBallBattleRoyale {
     viewport.initialize("Viewport", bskBallRoot, cmpCamera, canvas);
 
 
+    for (let i: number = 0; i < allCounters.length; i++)
 
-
-    //get refrences of important tree hierachy objects
-    staticEnvContainer = bskBallRoot.getChild(0);
+      //get refrences of important tree hierachy objects
+      staticEnvContainer = bskBallRoot.getChild(0);
     floorContainer = staticEnvContainer.getChild(0).getChild(0);
 
 
@@ -167,14 +168,31 @@ namespace basketBallBattleRoyale {
   }
 
   function setGameState(): void {
-    gameState.hitsAvatar = "Avatar Leben: " + hitsCounteAvatar;
-    gameState.hitsEnemyBlue = "EnemyBlue Leben: " + hitsCounteEnemyBlue;
-    gameState.hitsEnemyRed = "EnemyRed Leben: " + hitsCounteEnemyRed;
-    gameState.hitsEnemyMagenta = "EnemyMagenta Leben: " + hitsCounteEnemyMagenta;
+    gameState.hitsAvatar = "Avatar Leben: " + hitsCounterAvatar;
+    gameState.hitsEnemyBlue = "EnemyBlue Leben: " + hitsCounterEnemyBlue;
+    gameState.hitsEnemyRed = "EnemyRed Leben: " + hitsCounterEnemyRed;
+    gameState.hitsEnemyMagenta = "EnemyMagenta Leben: " + hitsCounterEnemyMagenta;
   }
 
   async function update(): Promise<void> {
     ƒ.Physics.world.simulate(fCore.Loop.timeFrameReal / 1000);
+    for (let i: number = 0; i < allCounters.length; i++) {
+      switch (i) {
+        case 0: allCounters[0] = hitsCounterAvatar;
+        case 1: allCounters[1] = hitsCounterEnemyBlue;
+        case 2: allCounters[2] = hitsCounterEnemyRed;
+        case 3: allCounters[3] = hitsCounterEnemyMagenta;
+      }
+      if (allCounters[i] <= 0)
+        switch (i) {
+          case (0): console.log("Avatar is going to bed");
+          case (1): console.log("EnemyBlue is going to bed");
+          case (2): console.log("EnemyRed is going to bed");
+          case (3): console.log("EnemyMagenta is going to bed");
+        }
+    }
+
+
 
     //sub functionality of triggers
     if (isRemoving) {
@@ -232,10 +250,10 @@ namespace basketBallBattleRoyale {
     let counterStand: number = 0;
     let counterTrigger: number = 0;
     for (let player of playersContainer.getChildren()) {
-      for (let containerOfMesh of player.getChildren()) {
-        for (let mesh of containerOfMesh.getChildren()) {
-          if (mesh.name == "Mesh") {
-            for (let meshChild of mesh.getChild(1).getChildren()) {
+      for (let containerOfMeshAndTrigger of player.getChildren()) {
+        for (let meshAndTrigger of containerOfMeshAndTrigger.getChildren()) {
+          if (meshAndTrigger.name == "Mesh") {
+            for (let meshChild of meshAndTrigger.getChild(1).getChildren()) {
               let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
                 0,
                 fCore.PHYSICS_TYPE.STATIC,
@@ -245,7 +263,7 @@ namespace basketBallBattleRoyale {
               meshChild.addComponent(staticRgdbdy);
             }
 
-            collMeshesOfBasketStand[counterStand] = mesh.getChild(0).getChild(1).getComponent(fCore.ComponentMesh);
+            collMeshesOfBasketStand[counterStand] = meshAndTrigger.getChild(0).getChild(1).getComponent(fCore.ComponentMesh);
             counterStand++;
             let staticRgdbdy: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
               0,
@@ -259,19 +277,19 @@ namespace basketBallBattleRoyale {
               fCore.COLLIDER_TYPE.CUBE,
               fCore.PHYSICS_GROUP.DEFAULT
             );
-            mesh.getChild(0).addComponent(staticRgdbdy);
-            mesh.getChild(0).getChild(0).addComponent(staticRgdbdy1);
+            meshAndTrigger.getChild(0).addComponent(staticRgdbdy);
+            meshAndTrigger.getChild(0).getChild(0).addComponent(staticRgdbdy1);
             let staticRgdbdy2: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
               0,
               fCore.PHYSICS_TYPE.STATIC,
               fCore.COLLIDER_TYPE.CUBE,
               fCore.PHYSICS_GROUP.DEFAULT
             );
-            mesh.getChild(0).getChild(1).addComponent(staticRgdbdy2);
-            mesh.getChild(0).getChild(1).mtxWorld.translateZ(-2);
+            meshAndTrigger.getChild(0).getChild(1).addComponent(staticRgdbdy2);
+            meshAndTrigger.getChild(0).getChild(1).mtxWorld.translateZ(-2);
           }
-          if (mesh.name == "Trigger") {
-            collMeshesOfBasketTrigger[counterTrigger] = mesh.getComponent(fCore.ComponentMesh);
+          if (meshAndTrigger.name == "Trigger") {
+            collMeshesOfBasketTrigger[counterTrigger] = meshAndTrigger.getComponent(fCore.ComponentMesh);
             let staticTrigger: fCore.ComponentRigidbody = new fCore.ComponentRigidbody(
               0,
               fCore.PHYSICS_TYPE.STATIC,
@@ -279,19 +297,19 @@ namespace basketBallBattleRoyale {
               fCore.PHYSICS_GROUP.TRIGGER
             );
 
-            mesh.addComponent(staticTrigger);
+            meshAndTrigger.addComponent(staticTrigger);
             switch (counterTrigger) {
               case (0):
-                mesh.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerAvatar);
+                meshAndTrigger.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerAvatar);
                 break;
               case (1):
-                mesh.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerEnemyBlue);
+                meshAndTrigger.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerEnemyBlue);
                 break;
               case (2):
-                mesh.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerEnemyRed);
+                meshAndTrigger.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerEnemyRed);
                 break;
               case (3):
-                mesh.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerEnemyMagenta);
+                meshAndTrigger.getComponent(fCore.ComponentRigidbody).addEventListener(fCore.EVENT_PHYSICS.TRIGGER_ENTER, hndTriggerEnemyMagenta);
                 break;
             }
             counterTrigger++;
