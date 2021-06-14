@@ -106,21 +106,19 @@ namespace basketBallBattleRoyale {
             basketBalls.forEach(basketBall => {
                 if (basketBall.getComponent(BasketBallsController)) {
                     if (sortedDistances[0] == Math.floor(fCore.Vector3.DIFFERENCE(this.enemyContainer.mtxWorld.translation, basketBall.mtxWorld.translation).magnitude))
-                        if (basketBall.getComponent(BasketBallsController))
+                        if (!basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready || !basketBall.getComponent(BasketBallsController).isInUse || !basketBall.getComponent(BasketBallsController).isInFlight || !this.targetedBall) {
+                            basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready = true;
+                            this.targetedBall = basketBall;
+                        }
+                        else if (sortedDistances[1] == Math.floor(fCore.Vector3.DIFFERENCE(this.enemyContainer.mtxWorld.translation, basketBall.mtxWorld.translation).magnitude))
                             if (!basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready || !basketBall.getComponent(BasketBallsController).isInUse || !basketBall.getComponent(BasketBallsController).isInFlight || !this.targetedBall) {
                                 basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready = true;
                                 this.targetedBall = basketBall;
-
-                            } else if (sortedDistances[1] == Math.floor(fCore.Vector3.DIFFERENCE(this.enemyContainer.mtxWorld.translation, basketBall.mtxWorld.translation).magnitude))
+                            } else if (sortedDistances[2] == Math.floor(fCore.Vector3.DIFFERENCE(this.enemyContainer.mtxWorld.translation, basketBall.mtxWorld.translation).magnitude))
                                 if (!basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready || !basketBall.getComponent(BasketBallsController).isInUse || !basketBall.getComponent(BasketBallsController).isInFlight || !this.targetedBall) {
                                     basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready = true;
                                     this.targetedBall = basketBall;
-
-                                } else if (sortedDistances[2] == Math.floor(fCore.Vector3.DIFFERENCE(this.enemyContainer.mtxWorld.translation, basketBall.mtxWorld.translation).magnitude))
-                                    if (!basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready || !basketBall.getComponent(BasketBallsController).isInUse || !basketBall.getComponent(BasketBallsController).isInFlight || !this.targetedBall) {
-                                        basketBall.getComponent(BasketBallsController).isInEnemysTargetAlready = true;
-                                        this.targetedBall = basketBall;
-                                    }
+                                }
                 }
             });
         }
